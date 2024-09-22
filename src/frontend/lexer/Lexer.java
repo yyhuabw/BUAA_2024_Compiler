@@ -14,7 +14,22 @@ public class Lexer {
     private char curChar;
     private final TokenStream tokens;
     private final ErrorTable errors;
-    private final HashMap<String, TokenType> words;
+    private static final HashMap<String, TokenType> words = new HashMap<>() {{
+        put("main", TokenType.MAINTK);
+        put("const", TokenType.CONSTTK);
+        put("int", TokenType.INTTK);
+        put("char", TokenType.CHARTK);
+        put("break", TokenType.BREAKTK);
+        put("continue", TokenType.CONTINUETK);
+        put("if", TokenType.IFTK);
+        put("else", TokenType.ELSETK);
+        put("for", TokenType.FORTK);
+        put("getint", TokenType.GETINTTK);
+        put("getchar", TokenType.GETCHARTK);
+        put("printf", TokenType.PRINTFTK);
+        put("return", TokenType.RETURNTK);
+        put("void", TokenType.VOIDTK);
+    }};
 
     public Lexer(PushbackInputStream stream, ErrorTable errors) throws IOException {
         this.stream = stream;
@@ -22,35 +37,20 @@ public class Lexer {
         this.curChar = (char) stream.read(); // first char
         this.tokens = new TokenStream();
         this.errors = errors;
-        this.words = new HashMap<>() {{
-            put("main", TokenType.MAINTK);
-            put("const", TokenType.CONSTTK);
-            put("int", TokenType.INTTK);
-            put("char", TokenType.CHARTK);
-            put("break", TokenType.BREAKTK);
-            put("continue", TokenType.CONTINUETK);
-            put("if", TokenType.IFTK);
-            put("else", TokenType.ELSETK);
-            put("for", TokenType.FORTK);
-            put("getint", TokenType.GETINTTK);
-            put("getchar", TokenType.GETCHARTK);
-            put("printf", TokenType.PRINTFTK);
-            put("return", TokenType.RETURNTK);
-            put("void", TokenType.VOIDTK);
-        }};
         analyse();
     }
 
-    private void read() throws IOException {
+    private void read() throws IOException { // read and update curChar
         curChar = (char) stream.read();
     }
 
-    private void unread() throws IOException {
-        stream.unread(curChar);
+    private void unread(char preChar) throws IOException { // unread and update curChar
+        stream.unread(curChar); // unread
+        curChar = preChar; // update
     }
 
-    private boolean endOfFile() {
-        return curChar == (char) -1;
+    private boolean fileNotEnd() {
+        return curChar != (char) -1;
     }
 
     private boolean endOfLine() {
@@ -58,7 +58,7 @@ public class Lexer {
     }
 
     private void analyse() throws IOException {
-        while (!endOfFile()) {
+        while (fileNotEnd()) {
             skipWhiteSpace();
             if (skipComment()) {
                 continue;
@@ -71,7 +71,7 @@ public class Lexer {
     }
 
     private void skipWhiteSpace() throws IOException {
-        while (!endOfFile() && Character.isWhitespace(curChar)) {
+        while (fileNotEnd() && Character.isWhitespace(curChar)) {
             if (endOfLine()) {
                 lineno++;
             }
@@ -83,10 +83,11 @@ public class Lexer {
         if (curChar != '/') {
             return false;
         }
+        char preChar = curChar;
         read();
         if (curChar == '/') { // type of //
             read();
-            while (!endOfFile() && !endOfLine()) {
+            while (fileNotEnd() && !endOfLine()) {
                 read();
             }
             if (endOfLine()) {
@@ -102,7 +103,7 @@ public class Lexer {
             }
             char prevChar = curChar;
             read();
-            while (!endOfFile() && !(prevChar == '*' && curChar == '/')) {
+            while (fileNotEnd() && !(prevChar == '*' && curChar == '/')) {
                 if (endOfLine()) {
                     lineno++;
                 }
@@ -112,8 +113,7 @@ public class Lexer {
             read();
             return true;
         }
-        unread();
-        curChar = '/';
+        unread(preChar);
         return false;
     }
 

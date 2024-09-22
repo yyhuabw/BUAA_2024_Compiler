@@ -17,12 +17,14 @@ public class Compiler {
         ErrorTable errorTable = new ErrorTable();
         Lexer lexer = new Lexer(inputStream, errorTable);
 
-        OutputStream outputStream = new FileOutputStream(outputFileName);
-        OutputStream errStream = new FileOutputStream(errorFileName);
-        if (errorTable.isEmpty()) {
-            outputStream.write(lexer.getTokens().toString().getBytes());
-        } else {
-            errStream.write(errorTable.toString().getBytes());
+        try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
+            try (OutputStream errStream = new FileOutputStream(errorFileName)) {
+                if (errorTable.isEmpty()) {
+                    outputStream.write(lexer.getTokens().toString().getBytes());
+                } else {
+                    errStream.write(errorTable.toString().getBytes());
+                }
+            }
         }
     }
 }

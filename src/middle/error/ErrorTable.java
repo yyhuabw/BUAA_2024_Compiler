@@ -24,7 +24,7 @@ public class ErrorTable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Error error : errors) {
-            sb.append(error.getLineno() + " " + error.getType().getCode() + "\n");
+            sb.append(error.getLineno()).append(" ").append(error.getType().getCode()).append("\n");
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();

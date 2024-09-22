@@ -17,7 +17,7 @@ public class TokenStream {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Token token : tokenList) {
-            sb.append(token.getType() + " " + token.getContent() + "\n");
+            sb.append(token.getType()).append(" ").append(token.getContent()).append("\n");
         }
         sb.setLength(sb.length() - 1);
         return sb.toString();
