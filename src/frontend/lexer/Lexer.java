@@ -120,9 +120,9 @@ public class Lexer {
     /**
      * int
      * word (reserved word or identifier)
-     * Type 1 + - * / % ; , ( ) [ ] { }
-     * Type 2 with && ||
-     * Type 3 < <= > >= ! != == =
+     * Type 1: + - * / % ; , ( ) [ ] { }
+     * Type 2: && ||
+     * Type 3: < <= > >= ! != == =
      * char string
      */
     private Token getToken() throws IOException {
