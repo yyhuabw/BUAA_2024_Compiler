@@ -1,6 +1,8 @@
 package frontend.lexer;
 
-public class Token {
+import frontend.parser.ast.SyntaxNode;
+
+public class Token implements SyntaxNode {
     private final TokenType type;
     private final String content;
     private final int lineno;
@@ -21,5 +23,10 @@ public class Token {
 
     public int getLineno() {
         return lineno;
+    }
+
+    @Override
+    public String syntaxInfoOutput() {
+        return type + " " + content + "\n";
     }
 }
