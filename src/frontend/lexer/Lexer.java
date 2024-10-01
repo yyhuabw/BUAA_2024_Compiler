@@ -220,11 +220,13 @@ public class Lexer {
     private Token getStringToken() throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append(curChar); // "
-        char preChar = curChar;
         read();
-        while (!(preChar != '\\' && curChar == '"')) {
+        while (curChar != '"') {
+            if (curChar == '\\') {
+                sb.append(curChar);
+                read();
+            }
             sb.append(curChar);
-            preChar = curChar;
             read();
         }
         sb.append(curChar); // "
