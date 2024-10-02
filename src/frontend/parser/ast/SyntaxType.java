@@ -19,30 +19,40 @@ public enum SyntaxType {
     UNARY_EXP("<UnaryExp>"),
     UNARY_OP("<UnaryOp>"),
 
-    // single
+    // expression
     EXP("<Exp>"),
     COND_EXP("<Cond>"),
     FUNC_REAL_PARAMS("<FuncRParams>"),
     CONST_EXP("<ConstExp>"),
 
     // constant
-    CONST_INITVAL("ConstInitVal"),
-    CONST_DECL("ConstDecl"),
-    CONST_DEF("ConstDef"),
+    CONST_INITVAL("<ConstInitVal>"),
+    CONST_DECL("<ConstDecl>"),
+    CONST_DEF("<ConstDef>"),
 
     // variable
-    VAR_DEF("VarDef"),
-    INIT_VAL("InitVal"),
-    VAR_DECL("VarDecl"),
+    VAR_DEF("<VarDef>"),
+    INIT_VAL("<InitVal>"),
+    VAR_DECL("<VarDecl>"),
 
     // stmt
-    STMT("Stmt"),
-    FOR_STMT("ForStmt"),
+    STMT("<Stmt>"),
+    FOR_STMT("<ForStmt>"),
 
     // block
-    BLOCK("Block"),
+    BLOCK("<Block>"),
 
-    //
+    // funcType
+    FUNC_TYPE("<FuncType>"),
+
+    // function
+    FUNC_DEF("<FuncDef>"),
+    MAIN_FUNC_DEF("<MainFuncDef>"),
+    FUNC_FORMAL_PARAMS("<FuncFParams>"),
+    FUNC_FORMAL_PARAM("<FuncFParam>"),
+
+    // unit
+    COMP_UNIT("<CompUnit>");
 
     private final String name;
 

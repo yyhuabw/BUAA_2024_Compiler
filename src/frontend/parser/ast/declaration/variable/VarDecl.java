@@ -2,7 +2,7 @@ package frontend.parser.ast.declaration.variable;
 
 import frontend.lexer.Token;
 import frontend.parser.ast.SyntaxType;
-import frontend.parser.ast.declaration.BType;
+import frontend.parser.ast.declaration.type.BType;
 import frontend.parser.ast.declaration.decl.DeclEle;
 import frontend.parser.ast.declaration.variable.varDef.VarDef;
 

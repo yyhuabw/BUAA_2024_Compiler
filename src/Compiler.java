@@ -20,7 +20,7 @@ public class Compiler {
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
             try (OutputStream errStream = new FileOutputStream(errorFileName)) {
                 if (errorTable.isEmpty()) {
-                    outputStream.write(lexer.getTokens().toString().getBytes());
+                    outputStream.write(lexer.getTokenStream().toString().getBytes());
                 } else {
                     errStream.write(errorTable.toString().getBytes());
                 }

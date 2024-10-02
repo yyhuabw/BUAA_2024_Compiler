@@ -12,7 +12,7 @@ public class Lexer {
     private final PushbackInputStream stream;
     private int lineno;
     private char curChar;
-    private final TokenStream tokens;
+    private final TokenStream tokenStream;
     private final ErrorTable errors;
     private static final HashMap<String, TokenType> words = new HashMap<>() {{
         put("main", TokenType.MAINTK);
@@ -35,7 +35,7 @@ public class Lexer {
         this.stream = stream;
         this.lineno = 1; // first line
         this.curChar = (char) stream.read(); // first char
-        this.tokens = new TokenStream();
+        this.tokenStream = new TokenStream();
         this.errors = errors;
         analyse();
     }
@@ -65,7 +65,7 @@ public class Lexer {
             }
             Token token = getToken();
             if (token != null) {
-                tokens.addToken(token);
+                tokenStream.addToken(token);
             }
         }
     }
@@ -245,7 +245,7 @@ public class Lexer {
         return new Token(type, content, lineno);
     }
 
-    public TokenStream getTokens() {
-        return tokens;
+    public TokenStream getTokenStream() {
+        return tokenStream;
     }
 }

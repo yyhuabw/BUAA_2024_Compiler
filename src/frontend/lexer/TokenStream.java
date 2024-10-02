@@ -4,13 +4,26 @@ import java.util.ArrayList;
 
 public class TokenStream {
     private final ArrayList<Token> tokenList;
+    private int curPos;
 
     public TokenStream() {
         this.tokenList = new ArrayList<>();
+        this.curPos = -1;
     }
 
     public void addToken(Token token) {
         this.tokenList.add(token);
+    }
+
+    public Token read() {
+        if (curPos >= tokenList.size() - 1) {
+            return null;
+        }
+        curPos++;
+        return tokenList.get(curPos);
+    }
+
+    public void unread() {
     }
 
     @Override
