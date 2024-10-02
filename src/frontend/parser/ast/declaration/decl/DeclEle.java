@@ -1,4 +1,4 @@
-package frontend.parser.ast.declaration;
+package frontend.parser.ast.declaration.decl;
 
 import frontend.parser.ast.SyntaxNode;
 

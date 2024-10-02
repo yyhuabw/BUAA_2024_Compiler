@@ -2,10 +2,10 @@ package frontend.parser.ast.terminal;
 
 import frontend.lexer.Token;
 import frontend.lexer.TokenType;
-import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitValEle;
+import frontend.parser.ast.declaration.variable.initVal.InitValEle;
 
-public class StringConst implements ConstInitValEle {
+public class StringConst implements ConstInitValEle, InitValEle {
     private final Token token;
 
     public StringConst(Token token) {

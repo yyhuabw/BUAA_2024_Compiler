@@ -30,6 +30,20 @@ public enum SyntaxType {
     CONST_DECL("ConstDecl"),
     CONST_DEF("ConstDef"),
 
+    // variable
+    VAR_DEF("VarDef"),
+    INIT_VAL("InitVal"),
+    VAR_DECL("VarDecl"),
+
+    // stmt
+    STMT("Stmt"),
+    FOR_STMT("ForStmt"),
+
+    // block
+    BLOCK("Block"),
+
+    //
+
     private final String name;
 
     SyntaxType(String name) {

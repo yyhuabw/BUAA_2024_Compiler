@@ -1,44 +1,42 @@
-package frontend.parser.ast.declaration.constant;
+package frontend.parser.ast.declaration.variable;
 
 import frontend.lexer.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.BType;
 import frontend.parser.ast.declaration.decl.DeclEle;
+import frontend.parser.ast.declaration.variable.varDef.VarDef;
 
 import java.util.ArrayList;
 
-public class ConstDecl implements DeclEle {
+public class VarDecl implements DeclEle {
     private final SyntaxType type;
-    private final Token constTk;
     private final BType bType;
-    private final ConstDef first;
+    private final VarDef first;
     private ArrayList<Token> commas = null;
-    private ArrayList<ConstDef> constDefs = null;
+    private ArrayList<VarDef> varDefs = null;
     private final Token semicolon;
 
-    public ConstDecl(Token constTk, BType bType, ConstDef first, Token semicolon) {
-        this.type = SyntaxType.CONST_DECL;
-        this.constTk = constTk;
+    public VarDecl(BType bType, VarDef first, Token semicolon) {
+        this.type = SyntaxType.VAR_DECL;
         this.bType = bType;
         this.first = first;
         this.semicolon = semicolon;
     }
 
-    public ConstDecl(Token constTk, BType bType, ConstDef first, ArrayList<Token> commas, ArrayList<ConstDef> constDefs, Token semicolon) {
-        this(constTk, bType, first, semicolon);
+    public VarDecl(BType bType, VarDef first, ArrayList<Token> commas, ArrayList<VarDef> varDefs, Token semicolon) {
+        this(bType, first, semicolon);
         this.commas = commas;
-        this.constDefs = constDefs;
+        this.varDefs = varDefs;
     }
 
     @Override
     public String syntaxInfoOutput() {
         StringBuilder sb = new StringBuilder();
-        sb.append(constTk.syntaxInfoOutput());
         sb.append(bType.syntaxInfoOutput());
         sb.append(first.syntaxInfoOutput());
         for (int i = 0; i < commas.size(); i++) {
             sb.append(commas.get(i).syntaxInfoOutput());
-            sb.append(constDefs.get(i).syntaxInfoOutput());
+            sb.append(varDefs.get(i).syntaxInfoOutput());
         }
         sb.append(semicolon.syntaxInfoOutput());
         sb.append(type.getName()).append("\n");
