@@ -19,15 +19,16 @@ public class TokenStream {
         return tokenList.get(curPos);
     }
 
+    public Token getLatterToken(int offset) {
+        return tokenList.get(curPos + offset);
+    }
+
     public Token read() {
         if (curPos >= tokenList.size() - 1) {
             return null;
         }
         curPos++;
         return tokenList.get(curPos);
-    }
-
-    public void unread() {
     }
 
     @Override

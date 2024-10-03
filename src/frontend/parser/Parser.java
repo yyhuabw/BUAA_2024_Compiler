@@ -10,10 +10,12 @@ import frontend.parser.ast.declaration.constant.constInitVal.ConstArrayInitVal;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitVal;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitValEle;
 import frontend.parser.ast.declaration.decl.Decl;
+import frontend.parser.ast.declaration.decl.DeclEle;
 import frontend.parser.ast.declaration.type.*;
 import frontend.parser.ast.declaration.variable.VarDecl;
 import frontend.parser.ast.declaration.variable.initVal.InitArrayVal;
 import frontend.parser.ast.declaration.variable.initVal.InitVal;
+import frontend.parser.ast.declaration.variable.initVal.InitValEle;
 import frontend.parser.ast.declaration.variable.varDef.VarDef;
 import frontend.parser.ast.declaration.variable.varDef.VarDefEle;
 import frontend.parser.ast.declaration.variable.varDef.VarInitDef;
@@ -26,10 +28,7 @@ import frontend.parser.ast.expression.single.Cond;
 import frontend.parser.ast.expression.single.ConstExp;
 import frontend.parser.ast.expression.single.Exp;
 import frontend.parser.ast.expression.single.FuncRParams;
-import frontend.parser.ast.expression.unaryExp.UnaryExp;
-import frontend.parser.ast.expression.unaryExp.UnaryFuncExp;
-import frontend.parser.ast.expression.unaryExp.UnaryOp;
-import frontend.parser.ast.expression.unaryExp.UnaryOpExp;
+import frontend.parser.ast.expression.unaryExp.*;
 import frontend.parser.ast.function.funcType.FuncType;
 import frontend.parser.ast.function.funcType.FuncTypeEle;
 import frontend.parser.ast.function.single.FuncDef;
@@ -38,6 +37,7 @@ import frontend.parser.ast.function.single.FuncFParams;
 import frontend.parser.ast.function.single.MainFuncDef;
 import frontend.parser.ast.statement.block.Block;
 import frontend.parser.ast.statement.block.BlockItem;
+import frontend.parser.ast.statement.block.BlockItemEle;
 import frontend.parser.ast.statement.stmt.*;
 import frontend.parser.ast.terminal.CharConst;
 import frontend.parser.ast.terminal.Ident;
@@ -59,6 +59,10 @@ public class Parser {
         return tokenStream.getCurToken();
     }
 
+    private boolean latterTkEquals(int offset, TokenType type) {
+        return tokenStream.getLatterToken(offset).getType().equals(type);
+    }
+
     private void read() {
         curToken = tokenStream.read();
     }
@@ -72,6 +76,25 @@ public class Parser {
 
     // stmt
     public Stmt parseStmt() {
+        StmtEle stmtEle = null;
+
+        switch (curToken.getType()) {
+            case SEMICN -> stmtEle = parseNullStmt();
+            case LBRACE -> stmtEle = parseBlock();
+            case IFTK -> stmtEle = parseIfStmt();
+            case FORTK -> stmtEle = parseForLoopStmt();
+            case BREAKTK -> stmtEle = parseBreakStmt();
+            case CONTINUETK -> stmtEle = parseContinueStmt();
+            case RETURNTK -> stmtEle = parseReturnStmt();
+            case PRINTFTK -> stmtEle = parsePrintfStmt();
+            case IDENFR -> stmtEle = dealIdentCase();
+            case LPARENT, INTCON, CHRCON, PLUS, MINU, NOT -> stmtEle = parseExpStmt();
+        }
+
+        return new Stmt(stmtEle);
+    }
+
+    private StmtEle dealIdentCase() {
     }
 
     public AssignStmt parseAssignStmt() {
@@ -88,7 +111,17 @@ public class Parser {
         return new AssignStmt(lVal, assign, exp, semicolon);
     }
 
+    public NullStmt parseNullStmt() {
+        Token semicolon = getCurToken();
+        read();
+        return new NullStmt(semicolon);
+    }
+
     public ExpStmt parseExpStmt() {
+        Exp exp = parseExp();
+        Token semicolon = getCurToken();
+        read();
+        return new ExpStmt(exp, semicolon);
     }
 
     public IfStmt parseIfStmt() {
@@ -115,6 +148,40 @@ public class Parser {
     }
 
     public ForLoopStmt parseForLoopStmt() {
+        ForStmt forStmt1 = null;
+        Cond cond = null;
+        ForStmt forStmt2 = null;
+
+        Token forTk = getCurToken();
+        read();
+
+        Token leftParent = getCurToken();
+        read();
+
+        if (!curEquals(TokenType.SEMICN)) {
+            forStmt1 = parseForStmt();
+        }
+
+        Token semicolon1 = getCurToken();
+        read();
+
+        if (!curEquals(TokenType.SEMICN)) {
+            cond = parseCond();
+        }
+
+        Token semicolon2 = getCurToken();
+        read();
+
+        if (!curEquals(TokenType.RPARENT)) {
+            forStmt2 = parseForStmt();
+        }
+
+        Token rightParent = getCurToken();
+        read();
+
+        Stmt stmt = parseStmt();
+
+        return new ForLoopStmt(forTk, leftParent, forStmt1, semicolon1, cond, semicolon2, forStmt2, rightParent, stmt);
     }
 
     public BreakStmt parseBreakStmt() {
@@ -191,6 +258,30 @@ public class Parser {
     }
 
     public PrintfStmt parsePrintfStmt() {
+        ArrayList<Token> commas = new ArrayList<>();
+        ArrayList<Exp> exps = new ArrayList<>();
+
+        Token printfTk = getCurToken();
+        read();
+
+        Token leftParent = getCurToken();
+        read();
+
+        StringConst stringConst = parseStringConst();
+
+        while (curEquals(TokenType.COMMA)) {
+            commas.add(getCurToken());
+            read();
+            exps.add(parseExp());
+        }
+
+        Token rightParent = getCurToken();
+        read();
+
+        Token semicolon = getCurToken();
+        read();
+
+        return new PrintfStmt(printfTk, leftParent, stringConst, commas, exps, rightParent, semicolon);
     }
 
     public ForStmt parseForStmt() {
@@ -203,13 +294,46 @@ public class Parser {
 
     // block
     public Block parseBlock() {
+        ArrayList<BlockItem> blockItems = new ArrayList<>();
+
+        Token leftBrace = getCurToken();
+        read();
+
+        while (!curEquals(TokenType.RBRACE)) {
+            blockItems.add(parseBlockItem());
+        }
+
+        Token rightBrace = getCurToken();
+        read();
+
+        return new Block(leftBrace, blockItems, rightBrace);
     }
 
     public BlockItem parseBlockItem() {
+        BlockItemEle blockItemEle = null;
+
+        if (curEquals(TokenType.CONSTTK) ||
+                curEquals(TokenType.INTTK) ||
+                curEquals(TokenType.CHARTK)) {
+            blockItemEle = parseDecl();
+        } else {
+            blockItemEle = parseStmt();
+        }
+
+        return new BlockItem(blockItemEle);
     }
 
     // decl
     public Decl parseDecl() {
+        DeclEle declEle = null;
+
+        if (curEquals(TokenType.CONSTTK)) {
+            declEle = parseConstDecl();
+        } else {
+            declEle = parseVarDecl();
+        }
+
+        return new Decl(declEle);
     }
 
     // constant
@@ -324,6 +448,17 @@ public class Parser {
     }
 
     public InitVal parseInitVal() {
+        InitValEle initValEle = null;
+
+        if (curEquals(TokenType.LBRACE)) {
+            initValEle = parseInitArrayVal();
+        } else if (curEquals(TokenType.STRCON)) {
+            initValEle = parseStringConst();
+        } else {
+            initValEle = parseExp();
+        }
+
+        return new InitVal(initValEle);
     }
 
     public InitArrayVal parseInitArrayVal() {
@@ -397,15 +532,90 @@ public class Parser {
 
     // function
     public FuncDef parseFuncDef() {
+        FuncFParams funcFParams = null;
+
+        FuncType funcType = parseFuncType();
+
+        Ident ident = parseIdent();
+
+        Token leftParent = getCurToken();
+        read();
+
+        if (!curEquals(TokenType.RPARENT)) {
+            funcFParams = parseFuncFParams();
+        }
+
+        Token rightParent = getCurToken();
+        read();
+
+        Block block = parseBlock();
+
+        return new FuncDef(funcType, ident, leftParent, funcFParams, rightParent, block);
     }
 
     public MainFuncDef parseMainFuncDef() {
+        Token intTk = getCurToken();
+        read();
+
+        Token mainTk = getCurToken();
+        read();
+
+        Token leftParent = getCurToken();
+        read();
+
+        Token rightParent = getCurToken();
+        read();
+
+        Block block = parseBlock();
+
+        return new MainFuncDef(intTk, mainTk, leftParent, rightParent, block);
     }
 
     public FuncFParams parseFuncFParams() {
+        ArrayList<Token> commas = new ArrayList<>();
+        ArrayList<FuncFParam> funcFParams = new ArrayList<>();
+
+        FuncFParam first = parseFuncFParam();
+
+        while (curEquals(TokenType.COMMA)) {
+            commas.add(getCurToken());
+            read();
+            funcFParams.add(parseFuncFParam());
+        }
+
+        return new FuncFParams(first, commas, funcFParams);
     }
 
     public FuncFParam parseFuncFParam() {
+        BType bType = parseBType();
+
+        Ident ident = parseIdent();
+
+        if (curEquals(TokenType.LBRACK)) {
+            Token firstLeftBracket = getCurToken();
+            read();
+
+            Token firstRightBracket = getCurToken();
+            read();
+
+            // multi-dimentional array
+            ArrayList<Token> leftBrackets = new ArrayList<>();
+            ArrayList<ConstExp> constExps = new ArrayList<>();
+            ArrayList<Token> rightBrackets = new ArrayList<>();
+
+            while (curEquals(TokenType.LBRACK)) {
+                leftBrackets.add(getCurToken());
+                read();
+
+                constExps.add(parseConstExp());
+
+                rightBrackets.add(getCurToken());
+                read();
+            }
+
+            return new FuncFParam(bType, ident, firstLeftBracket, firstRightBracket, leftBrackets, constExps, rightBrackets);
+        }
+        return new FuncFParam(bType, ident);
     }
 
     // expression
@@ -536,6 +746,20 @@ public class Parser {
 
     //unaryExp
     public UnaryExp parseUnaryExp() {
+        UnaryExpEle unaryExpEle = null;
+
+        if (curEquals(TokenType.IDENFR) &&
+                latterTkEquals(1,TokenType.LPARENT)) {
+            unaryExpEle = parseUnaryFuncExp();
+        } else if (curEquals(TokenType.PLUS) ||
+                curEquals(TokenType.MINU) ||
+                curEquals(TokenType.NOT)) {
+            unaryExpEle = parseUnaryOpExp();
+        } else {
+            unaryExpEle = parsePrimaryExp();
+        }
+
+        return new UnaryExp(unaryExpEle);
     }
 
     public UnaryFuncExp parseUnaryFuncExp() {
