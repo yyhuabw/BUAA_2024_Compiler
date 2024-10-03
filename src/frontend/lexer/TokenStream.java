@@ -15,6 +15,10 @@ public class TokenStream {
         this.tokenList.add(token);
     }
 
+    public Token getCurToken() {
+        return tokenList.get(curPos);
+    }
+
     public Token read() {
         if (curPos >= tokenList.size() - 1) {
             return null;
