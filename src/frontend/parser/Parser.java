@@ -67,11 +67,50 @@ public class Parser {
         curToken = tokenStream.read();
     }
 
+    private void setBackPoint() {
+        tokenStream.setBackPoint();
+    }
+
+    private void backtrack() {
+        tokenStream.backtrack();
+        curToken = tokenStream.getCurToken();
+    }
+
     private boolean curEquals(TokenType type) {
         return curToken.getType().equals(type);
     }
 
+    /**
+     * CompUnit → {Decl} {FuncDef} MainFuncDef
+     * Decl → ConstDecl | VarDecl
+     * - ConstDecl → 'const' BType ConstDef { ',' ConstDef } ';'
+     * - VarDecl → BType VarDef { ',' VarDef } ';'
+     * FuncDef → FuncType Ident '(' [FuncFParams] ')' Block
+     * MainFuncDef → 'int' 'main' '(' ')' Block
+     */
     public CompUnit parseCompUnit() {
+        ArrayList<Decl> decls = new ArrayList<>();
+        ArrayList<FuncDef> funcDefs = new ArrayList<>();
+        MainFuncDef mainFuncDef = null;
+
+        while (true) {
+            if (curToken == null) {
+                break;
+            } else if (latterTkEquals(1, TokenType.MAINTK)) {
+                mainFuncDef = parseMainFuncDef();
+                break;
+            } else if (latterTkEquals(2, TokenType.LPARENT)) {
+                funcDefs.add(parseFuncDef());
+            } else if (curEquals(TokenType.CONSTTK) ||
+                    curEquals(TokenType.INTTK) ||
+                    curEquals(TokenType.CHARTK)) {
+                decls.add(parseDecl());
+            } else {
+                break;
+            }
+        }
+
+        return new CompUnit(decls, funcDefs, mainFuncDef);
     }
 
     // stmt
@@ -94,7 +133,30 @@ public class Parser {
         return new Stmt(stmtEle);
     }
 
+    /**
+     * ExpStmt → Exp ';'
+     * AssignStmt → LVal '=' Exp ';'
+     * GetintStmt → LVal '=' 'getint''('')'';'
+     * GetcharStmt → LVal '=' 'getchar''('')'';'
+     */
     private StmtEle dealIdentCase() {
+        setBackPoint();
+        parseExp();
+        if (curEquals(TokenType.ASSIGN)) {
+            if (latterTkEquals(1, TokenType.GETINTTK)) {
+                backtrack();
+                return parseGetintStmt();
+            } else if (latterTkEquals(1, TokenType.GETCHARTK)) {
+                backtrack();
+                return parseGetcharStmt();
+            } else {
+                backtrack();
+                return parseAssignStmt();
+            }
+        } else {
+            backtrack();
+            return parseExpStmt();
+        }
     }
 
     public AssignStmt parseAssignStmt() {
@@ -310,7 +372,7 @@ public class Parser {
     }
 
     public BlockItem parseBlockItem() {
-        BlockItemEle blockItemEle = null;
+        BlockItemEle blockItemEle;
 
         if (curEquals(TokenType.CONSTTK) ||
                 curEquals(TokenType.INTTK) ||
@@ -325,7 +387,7 @@ public class Parser {
 
     // decl
     public Decl parseDecl() {
-        DeclEle declEle = null;
+        DeclEle declEle;
 
         if (curEquals(TokenType.CONSTTK)) {
             declEle = parseConstDecl();
@@ -338,8 +400,8 @@ public class Parser {
 
     // constant
     public ConstInitVal parseConstInitVal() {
-        ConstInitValEle constInitValEle = null;
-        if (curEquals(TokenType.RBRACE)) {
+        ConstInitValEle constInitValEle;
+        if (curEquals(TokenType.LBRACE)) {
             constInitValEle = parseConstArrayInitVal();
         } else if (curEquals(TokenType.STRCON)) {
             constInitValEle = parseStringConst();
@@ -420,7 +482,7 @@ public class Parser {
 
     // variable
     public VarDef parseVarDef() {
-        VarDefEle varDefEle = null;
+        VarDefEle varDefEle;
         ArrayList<Token> leftBrackets = new ArrayList<>();
         ArrayList<ConstExp> constExps = new ArrayList<>();
         ArrayList<Token> rightBrackets = new ArrayList<>();
@@ -448,7 +510,7 @@ public class Parser {
     }
 
     public InitVal parseInitVal() {
-        InitValEle initValEle = null;
+        InitValEle initValEle;
 
         if (curEquals(TokenType.LBRACE)) {
             initValEle = parseInitArrayVal();
@@ -746,10 +808,10 @@ public class Parser {
 
     //unaryExp
     public UnaryExp parseUnaryExp() {
-        UnaryExpEle unaryExpEle = null;
+        UnaryExpEle unaryExpEle;
 
         if (curEquals(TokenType.IDENFR) &&
-                latterTkEquals(1,TokenType.LPARENT)) {
+                latterTkEquals(1, TokenType.LPARENT)) {
             unaryExpEle = parseUnaryFuncExp();
         } else if (curEquals(TokenType.PLUS) ||
                 curEquals(TokenType.MINU) ||

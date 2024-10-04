@@ -13,7 +13,7 @@ public class FuncFParams implements SyntaxNode {
     private ArrayList<FuncFParam> funcFParams = null;
 
     public FuncFParams(FuncFParam first) {
-        this.type = SyntaxType.FUNC_REAL_PARAMS;
+        this.type = SyntaxType.FUNC_FORMAL_PARAMS;
         this.first = first;
     }
 

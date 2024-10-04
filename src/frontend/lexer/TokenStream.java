@@ -5,10 +5,12 @@ import java.util.ArrayList;
 public class TokenStream {
     private final ArrayList<Token> tokenList;
     private int curPos;
+    private int backPoint;
 
     public TokenStream() {
         this.tokenList = new ArrayList<>();
         this.curPos = -1;
+        this.backPoint = -1;
     }
 
     public void addToken(Token token) {
@@ -29,6 +31,14 @@ public class TokenStream {
         }
         curPos++;
         return tokenList.get(curPos);
+    }
+
+    public void setBackPoint() {
+        backPoint = curPos;
+    }
+
+    public void backtrack() {
+        curPos = backPoint;
     }
 
     @Override

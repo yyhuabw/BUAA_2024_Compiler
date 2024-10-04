@@ -1,7 +1,6 @@
 package frontend.parser.ast.terminal;
 
 import frontend.lexer.Token;
-import frontend.lexer.TokenType;
 import frontend.parser.ast.SyntaxNode;
 
 public class CharConst implements SyntaxNode {
@@ -9,10 +8,6 @@ public class CharConst implements SyntaxNode {
 
     public CharConst(Token token) {
         this.token = token;
-    }
-
-    public CharConst(String content, int lineno) {
-        this.token = new Token(TokenType.CHRCON, content, lineno);
     }
 
     @Override
