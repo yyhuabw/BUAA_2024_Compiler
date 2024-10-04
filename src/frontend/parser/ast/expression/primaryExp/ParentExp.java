@@ -1,6 +1,6 @@
 package frontend.parser.ast.expression.primaryExp;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Exp;
 
 public class ParentExp implements PrimaryExpEle {

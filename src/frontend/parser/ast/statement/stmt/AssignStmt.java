@@ -1,6 +1,6 @@
 package frontend.parser.ast.statement.stmt;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.primaryExp.LVal;
 import frontend.parser.ast.expression.single.Exp;
 

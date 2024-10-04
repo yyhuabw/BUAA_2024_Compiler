@@ -1,6 +1,6 @@
 package frontend.parser.ast.declaration.variable.initVal;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Exp;
 
 import java.util.ArrayList;

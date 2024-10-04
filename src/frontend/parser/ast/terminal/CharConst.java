@@ -1,6 +1,6 @@
 package frontend.parser.ast.terminal;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 
 public class CharConst implements SyntaxNode {

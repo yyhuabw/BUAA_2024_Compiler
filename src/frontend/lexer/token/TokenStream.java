@@ -1,4 +1,4 @@
-package frontend.lexer;
+package frontend.lexer.token;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class TokenStream {
         return tokenList.get(curPos);
     }
 
-    public Token getLatterToken(int offset) {
+    public Token moveToken(int offset) {
         return tokenList.get(curPos + offset);
     }
 

@@ -1,6 +1,6 @@
 package frontend.parser.ast.expression.unaryExp;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.FuncRParams;
 import frontend.parser.ast.terminal.Ident;
 

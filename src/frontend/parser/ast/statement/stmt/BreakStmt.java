@@ -1,6 +1,6 @@
 package frontend.parser.ast.statement.stmt;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 
 public class BreakStmt implements StmtEle {
     private final Token breakTk;

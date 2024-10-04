@@ -1,6 +1,6 @@
 package frontend.parser.ast.statement.stmt;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Cond;
 
 public class ForLoopStmt implements StmtEle {
@@ -26,78 +26,6 @@ public class ForLoopStmt implements StmtEle {
         this.semicolon2 = semicolon2;
         this.rightParent = rightParent;
         this.stmt = stmt;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       ForStmt forStmt1,
-                       Token semicolon1,
-                       Token semicolon2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.forStmt1 = forStmt1;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       Token semicolon1,
-                       Cond cond,
-                       Token semicolon2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.cond = cond;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       ForStmt forStmt1,
-                       Token semicolon1,
-                       Cond cond,
-                       Token semicolon2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.forStmt1 = forStmt1;
-        this.cond = cond;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       Token semicolon1,
-                       Token semicolon2,
-                       ForStmt forStmt2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.forStmt2 = forStmt2;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       ForStmt forStmt1,
-                       Token semicolon1,
-                       Token semicolon2,
-                       ForStmt forStmt2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.forStmt1 = forStmt1;
-        this.forStmt2 = forStmt2;
-    }
-
-    public ForLoopStmt(Token forTk,
-                       Token leftParent,
-                       Token semicolon1,
-                       Cond cond,
-                       Token semicolon2,
-                       ForStmt forStmt2,
-                       Token rightParent,
-                       Stmt stmt) {
-        this(forTk, leftParent, semicolon1, semicolon2, rightParent, stmt);
-        this.cond = cond;
-        this.forStmt2 = forStmt2;
     }
 
     public ForLoopStmt(Token forTk,

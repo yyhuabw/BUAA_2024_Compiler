@@ -1,5 +1,8 @@
 package frontend.lexer;
 
+import frontend.lexer.token.Token;
+import frontend.lexer.token.TokenStream;
+import frontend.lexer.token.TokenType;
 import middle.error.Error;
 import middle.error.ErrorTable;
 import middle.error.ErrorType;
@@ -13,7 +16,7 @@ public class Lexer {
     private int lineno;
     private char curChar;
     private final TokenStream tokenStream;
-    private final ErrorTable errors;
+    private final ErrorTable errorTable;
     private static final HashMap<String, TokenType> words = new HashMap<>() {{
         put("main", TokenType.MAINTK);
         put("const", TokenType.CONSTTK);
@@ -31,12 +34,12 @@ public class Lexer {
         put("void", TokenType.VOIDTK);
     }};
 
-    public Lexer(PushbackInputStream stream, ErrorTable errors) throws IOException {
+    public Lexer(PushbackInputStream stream, ErrorTable errorTable) throws IOException {
         this.stream = stream;
         this.lineno = 1; // first line
         this.curChar = (char) stream.read(); // first char
         this.tokenStream = new TokenStream();
-        this.errors = errors;
+        this.errorTable = errorTable;
         analyse();
     }
 
@@ -172,7 +175,7 @@ public class Lexer {
     private Token getType2Token(char c, TokenType type, String content) throws IOException {
         read();
         if (curChar != c) { // a-level error
-            errors.addError(new Error(ErrorType.ILLEGAL_CHAR, lineno));
+            errorTable.addError(new Error(ErrorType.ILLEGAL_CHAR, lineno));
             return new Token(type, Character.toString(c), lineno);
         }
         read();

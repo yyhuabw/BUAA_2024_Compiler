@@ -1,6 +1,6 @@
 package frontend.parser.ast.declaration.constant.constInitVal;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.ConstExp;
 
 import java.util.ArrayList;

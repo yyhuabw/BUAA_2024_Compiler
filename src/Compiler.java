@@ -1,5 +1,6 @@
 import frontend.lexer.Lexer;
 import frontend.parser.Parser;
+import frontend.parser.ast.CompUnit;
 import middle.error.ErrorTable;
 
 import java.io.FileInputStream;
@@ -17,10 +18,17 @@ public class Compiler {
                 new PushbackInputStream(new FileInputStream(inputFileName));
         ErrorTable errorTable = new ErrorTable();
         Lexer lexer = new Lexer(inputStream, errorTable);
-        Parser parser = new Parser(lexer.getTokenStream());
+        Parser parser = new Parser(lexer.getTokenStream(), errorTable);
+        CompUnit compUnit = parser.parseCompUnit();
 
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
-            outputStream.write(parser.parseCompUnit().syntaxInfoOutput().getBytes());
+            try (OutputStream errStream = new FileOutputStream(errorFileName)) {
+                if (errorTable.isEmpty()) {
+                    outputStream.write(compUnit.syntaxInfoOutput().getBytes());
+                } else {
+                    errStream.write(errorTable.toString().getBytes());
+                }
+            }
         }
     }
 }

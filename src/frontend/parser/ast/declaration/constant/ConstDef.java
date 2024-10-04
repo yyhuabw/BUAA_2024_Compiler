@@ -1,6 +1,6 @@
 package frontend.parser.ast.declaration.constant;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitVal;

@@ -1,4 +1,4 @@
-package frontend.lexer;
+package frontend.lexer.token;
 
 public enum TokenType {
     IDENFR,     // Ident

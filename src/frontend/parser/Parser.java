@@ -1,8 +1,8 @@
 package frontend.parser;
 
-import frontend.lexer.Token;
-import frontend.lexer.TokenStream;
-import frontend.lexer.TokenType;
+import frontend.lexer.token.Token;
+import frontend.lexer.token.TokenStream;
+import frontend.lexer.token.TokenType;
 import frontend.parser.ast.CompUnit;
 import frontend.parser.ast.declaration.constant.ConstDecl;
 import frontend.parser.ast.declaration.constant.ConstDef;
@@ -43,24 +43,25 @@ import frontend.parser.ast.terminal.CharConst;
 import frontend.parser.ast.terminal.Ident;
 import frontend.parser.ast.terminal.IntConst;
 import frontend.parser.ast.terminal.StringConst;
+import middle.error.Error;
+import middle.error.ErrorTable;
+import middle.error.ErrorType;
 
 import java.util.ArrayList;
 
 public class Parser {
     private final TokenStream tokenStream;
     private Token curToken;
+    private final ErrorTable errorTable;
 
-    public Parser(TokenStream tokenStream) {
+    public Parser(TokenStream tokenStream, ErrorTable errorTable) {
         this.tokenStream = tokenStream;
         this.curToken = tokenStream.read();
+        this.errorTable = errorTable;
     }
 
     private Token getCurToken() {
         return tokenStream.getCurToken();
-    }
-
-    private boolean latterTkEquals(int offset, TokenType type) {
-        return tokenStream.getLatterToken(offset).getType().equals(type);
     }
 
     private void read() {
@@ -80,6 +81,28 @@ public class Parser {
         return curToken.getType().equals(type);
     }
 
+    private boolean movedTkEquals(int offset, TokenType type) {
+        return tokenStream.moveToken(offset).getType().equals(type);
+    }
+
+    private int getPrevTkLineno() {
+        return tokenStream.moveToken(-1).getLineno();
+    }
+
+    private void addError(ErrorType type, int lineno) {
+        errorTable.addError(new Error(type, lineno));
+    }
+
+    private boolean curInExpFirstSet() {
+        return curEquals(TokenType.PLUS) ||
+                curEquals(TokenType.MINU) ||
+                curEquals(TokenType.NOT) ||
+                curEquals(TokenType.IDENFR) ||
+                curEquals(TokenType.LPARENT) ||
+                curEquals(TokenType.INTCON) ||
+                curEquals(TokenType.CHRCON);
+    }
+
     /**
      * CompUnit → {Decl} {FuncDef} MainFuncDef
      * Decl → ConstDecl | VarDecl
@@ -96,10 +119,10 @@ public class Parser {
         while (true) {
             if (curToken == null) {
                 break;
-            } else if (latterTkEquals(1, TokenType.MAINTK)) {
+            } else if (movedTkEquals(1, TokenType.MAINTK)) {
                 mainFuncDef = parseMainFuncDef();
                 break;
-            } else if (latterTkEquals(2, TokenType.LPARENT)) {
+            } else if (movedTkEquals(2, TokenType.LPARENT)) {
                 funcDefs.add(parseFuncDef());
             } else if (curEquals(TokenType.CONSTTK) ||
                     curEquals(TokenType.INTTK) ||
@@ -115,7 +138,7 @@ public class Parser {
 
     // stmt
     public Stmt parseStmt() {
-        StmtEle stmtEle = null;
+        StmtEle stmtEle;
 
         switch (curToken.getType()) {
             case SEMICN -> stmtEle = parseNullStmt();
@@ -128,6 +151,8 @@ public class Parser {
             case PRINTFTK -> stmtEle = parsePrintfStmt();
             case IDENFR -> stmtEle = dealIdentCase();
             case LPARENT, INTCON, CHRCON, PLUS, MINU, NOT -> stmtEle = parseExpStmt();
+
+            default -> stmtEle = new NullStmt(handleIError()); // error
         }
 
         return new Stmt(stmtEle);
@@ -143,10 +168,10 @@ public class Parser {
         setBackPoint();
         parseExp();
         if (curEquals(TokenType.ASSIGN)) {
-            if (latterTkEquals(1, TokenType.GETINTTK)) {
+            if (movedTkEquals(1, TokenType.GETINTTK)) {
                 backtrack();
                 return parseGetintStmt();
-            } else if (latterTkEquals(1, TokenType.GETCHARTK)) {
+            } else if (movedTkEquals(1, TokenType.GETCHARTK)) {
                 backtrack();
                 return parseGetcharStmt();
             } else {
@@ -167,8 +192,7 @@ public class Parser {
 
         Exp exp = parseExp();
 
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
 
         return new AssignStmt(lVal, assign, exp, semicolon);
     }
@@ -181,8 +205,7 @@ public class Parser {
 
     public ExpStmt parseExpStmt() {
         Exp exp = parseExp();
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
         return new ExpStmt(exp, semicolon);
     }
 
@@ -195,8 +218,7 @@ public class Parser {
 
         Cond cond = parseCond();
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
         Stmt ifStmt = parseStmt();
 
@@ -249,16 +271,14 @@ public class Parser {
     public BreakStmt parseBreakStmt() {
         Token breakTk = getCurToken();
         read();
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
         return new BreakStmt(breakTk, semicolon);
     }
 
     public ContinueStmt parseContinueStmt() {
         Token continueTk = getCurToken();
         read();
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
         return new ContinueStmt(continueTk, semicolon);
     }
 
@@ -266,14 +286,12 @@ public class Parser {
         Token returnTk = getCurToken();
         read();
 
-        if (!curEquals(TokenType.SEMICN)) {
+        if (curInExpFirstSet()) {
             Exp exp = parseExp();
-            Token semicolon = getCurToken();
-            read();
+            Token semicolon = handleIError();
             return new ReturnStmt(returnTk, exp, semicolon);
         }
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
         return new ReturnStmt(returnTk, semicolon);
     }
 
@@ -289,11 +307,9 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
 
         return new GetintStmt(lVal, assign, getintTk, leftParent, rightParent, semicolon);
     }
@@ -310,11 +326,9 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
 
         return new GetcharStmt(lVal, assign, getcharTk, leftParent, rightParent, semicolon);
     }
@@ -337,11 +351,9 @@ public class Parser {
             exps.add(parseExp());
         }
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
-        Token semicolon = getCurToken();
-        read();
+        Token semicolon = handleIError();
 
         return new PrintfStmt(printfTk, leftParent, stringConst, commas, exps, rightParent, semicolon);
     }
@@ -434,6 +446,7 @@ public class Parser {
         return  new ConstArrayInitVal(leftBrace, first, commas, constExps, rightBrace);
     }
 
+    // ConstDecl → 'const' BType ConstDef { ',' ConstDef } ';' // i
     public ConstDecl parseConstDecl() {
         ArrayList<Token> commas = new ArrayList<>();
         ArrayList<ConstDef> constDefs = new ArrayList<>();
@@ -451,8 +464,8 @@ public class Parser {
             constDefs.add(parseConstDef());
         }
 
-        Token semicolon = getCurToken();
-        read();
+        // handle type i error
+        Token semicolon = handleIError();
 
         return new ConstDecl(constTk, bType, first, commas, constDefs, semicolon);
     }
@@ -468,8 +481,8 @@ public class Parser {
             leftBrackets.add(getCurToken());
             read();
             constExps.add(parseConstExp());
-            rightBrackets.add(getCurToken());
-            read();
+            Token rightBracket = handleKError();
+            rightBrackets.add(rightBracket);
         }
 
         Token assign = getCurToken();
@@ -493,8 +506,8 @@ public class Parser {
             leftBrackets.add(getCurToken());
             read();
             constExps.add(parseConstExp());
-            rightBrackets.add(getCurToken());
-            read();
+            Token rightBracket = handleKError();
+            rightBrackets.add(rightBracket);
         }
 
         if (curEquals(TokenType.ASSIGN)) {
@@ -546,6 +559,7 @@ public class Parser {
         return new InitArrayVal(leftBrace, first, commas, exps, rightBrace);
     }
 
+    // VarDecl → BType VarDef { ',' VarDef } ';' // i
     public VarDecl parseVarDecl() {
         ArrayList<Token> commas = new ArrayList<>();
         ArrayList<VarDef> varDefs = new ArrayList<>();
@@ -560,8 +574,8 @@ public class Parser {
             varDefs.add(parseVarDef());
         }
 
-        Token semicolon = getCurToken();
-        read();
+        // handle type i error
+        Token semicolon = handleIError();
 
         return new VarDecl(bType, first, commas, varDefs, semicolon);
     }
@@ -593,6 +607,7 @@ public class Parser {
     }
 
     // function
+    // FuncDef → FuncType Ident '(' [FuncFParams] ')' Block // j
     public FuncDef parseFuncDef() {
         FuncFParams funcFParams = null;
 
@@ -603,12 +618,12 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        if (!curEquals(TokenType.RPARENT)) {
+        // the first set of FuncFParams is 'int' | 'char'
+        if (curEquals(TokenType.INTTK) || curEquals(TokenType.CHARTK)) {
             funcFParams = parseFuncFParams();
         }
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
         Block block = parseBlock();
 
@@ -625,8 +640,7 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
 
         Block block = parseBlock();
 
@@ -657,8 +671,7 @@ public class Parser {
             Token firstLeftBracket = getCurToken();
             read();
 
-            Token firstRightBracket = getCurToken();
-            read();
+            Token firstRightBracket = handleKError();
 
             // multi-dimentional array
             ArrayList<Token> leftBrackets = new ArrayList<>();
@@ -671,8 +684,8 @@ public class Parser {
 
                 constExps.add(parseConstExp());
 
-                rightBrackets.add(getCurToken());
-                read();
+                Token rightBracket = handleKError();
+                rightBrackets.add(rightBracket);
             }
 
             return new FuncFParam(bType, ident, firstLeftBracket, firstRightBracket, leftBrackets, constExps, rightBrackets);
@@ -811,7 +824,7 @@ public class Parser {
         UnaryExpEle unaryExpEle;
 
         if (curEquals(TokenType.IDENFR) &&
-                latterTkEquals(1, TokenType.LPARENT)) {
+                movedTkEquals(1, TokenType.LPARENT)) {
             unaryExpEle = parseUnaryFuncExp();
         } else if (curEquals(TokenType.PLUS) ||
                 curEquals(TokenType.MINU) ||
@@ -830,16 +843,13 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        if (!curEquals(TokenType.RPARENT)) {
+        if (curInExpFirstSet()) {
             FuncRParams funcRParams = parseFuncRParams();
-            Token rightParent = getCurToken();
-            read();
+            Token rightParent = handleJError();
             return new UnaryFuncExp(ident, leftParent, funcRParams, rightParent);
-        } else {
-            Token rightParent = getCurToken();
-            read();
-            return new UnaryFuncExp(ident, leftParent, rightParent);
         }
+        Token rightParent = handleJError();
+        return new UnaryFuncExp(ident, leftParent, rightParent);
     }
 
     public UnaryOpExp parseUnaryOpExp() {
@@ -873,8 +883,7 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
         Exp exp = parseExp();
-        Token rightParent = getCurToken();
-        read();
+        Token rightParent = handleJError();
         return new ParentExp(leftParent, exp, rightParent);
     }
 
@@ -889,8 +898,8 @@ public class Parser {
             leftBrackets.add(getCurToken());
             read();
             exps.add(parseExp());
-            rightBrackets.add(getCurToken());
-            read();
+            Token rightBracket = handleKError();
+            rightBrackets.add(rightBracket);
         }
 
         return new LVal(ident, leftBrackets, exps, rightBrackets);
@@ -927,5 +936,44 @@ public class Parser {
         StringConst stringConst = new StringConst(getCurToken());
         read();
         return stringConst;
+    }
+
+    private Token handleIError() {
+        Token semicolon;
+        if (curEquals(TokenType.SEMICN)) {
+            semicolon = getCurToken();
+            read();
+        } else {
+            int lineno = getPrevTkLineno();
+            addError(ErrorType.MISSING_SEMICN, lineno);
+            semicolon = new Token(TokenType.SEMICN, "", lineno);
+        }
+        return semicolon;
+    }
+
+    private Token handleJError() {
+        Token rightParent;
+        if (curEquals(TokenType.RPARENT)) {
+            rightParent = getCurToken();
+            read();
+        } else {
+            int lineno = getPrevTkLineno();
+            addError(ErrorType.MISSING_R_PARENT, lineno);
+            rightParent = new Token(TokenType.RPARENT, "", lineno);
+        }
+        return rightParent;
+    }
+
+    private Token handleKError() {
+        Token rightBracket;
+        if (curEquals(TokenType.RBRACK)) {
+            rightBracket = getCurToken();
+            read();
+        } else {
+            int lineno = getPrevTkLineno();
+            addError(ErrorType.MISSING_R_BRACK, lineno);
+            rightBracket = new Token(TokenType.RBRACK, "", lineno);
+        }
+        return rightBracket;
     }
 }

@@ -1,6 +1,6 @@
 package frontend.parser.ast.statement.block;
 
-import frontend.lexer.Token;
+import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.statement.stmt.StmtEle;
 
