@@ -5,15 +5,23 @@ import java.util.TreeSet;
 public class ErrorTable {
     private final TreeSet<Error> errorSet;
     private int cnt;
+    private boolean isBacktracking;
 
     public ErrorTable() {
         this.errorSet = new TreeSet<>();
         this.cnt = 0;
+        this.isBacktracking = false;
     }
 
     public void addError(Error error) {
-        errorSet.add(error);
-        cnt++;
+        if (!isBacktracking) {
+            errorSet.add(error);
+            cnt++;
+        }
+    }
+
+    public void setBacktrack(boolean state) {
+        isBacktracking = state;
     }
 
     public boolean isEmpty() {

@@ -70,10 +70,12 @@ public class Parser {
 
     private void setBackPoint() {
         tokenStream.setBackPoint();
+        errorTable.setBacktrack(true);
     }
 
     private void backtrack() {
         tokenStream.backtrack();
+        errorTable.setBacktrack(false);
         curToken = tokenStream.getCurToken();
     }
 
