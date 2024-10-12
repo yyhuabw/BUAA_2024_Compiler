@@ -23,6 +23,14 @@ public class Block implements StmtEle {
         this.blockItems = blockItems;
     }
 
+    public ArrayList<BlockItem> getBlockItems() {
+        return blockItems;
+    }
+
+    public int getRightBraceLineno() {
+        return rightBrace.getLineno();
+    }
+
     @Override
     public String syntaxInfoOutput() {
         StringBuilder sb = new StringBuilder();

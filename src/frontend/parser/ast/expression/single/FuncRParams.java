@@ -19,6 +19,17 @@ public class FuncRParams implements SyntaxNode {
         this.exps = exps;
     }
 
+    public int getParamsSize() {
+        return 1 + commas.size();
+    }
+
+    public ArrayList<Exp> getAllExps() {
+        ArrayList<Exp> allExps = new ArrayList<>();
+        allExps.add(first);
+        allExps.addAll(exps);
+        return allExps;
+    }
+
     @Override
     public String syntaxInfoOutput() {
         StringBuilder sb = new StringBuilder();

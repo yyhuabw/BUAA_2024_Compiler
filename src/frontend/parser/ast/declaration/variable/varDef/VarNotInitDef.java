@@ -3,6 +3,9 @@ package frontend.parser.ast.declaration.variable.varDef;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.ConstExp;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.SymbolManager;
+import middle.symbol.VarSymbol;
+import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
@@ -21,6 +24,13 @@ public class VarNotInitDef implements VarDefEle {
         this.leftBrackets = leftBrackets;
         this.constExps = constExps;
         this.rightBrackets = rightBrackets;
+    }
+
+    public boolean addToSTAndCheck(ValueType valueType) {
+        String name = ident.getToken().getContent();
+        int dimension = leftBrackets.size();
+        VarSymbol varSymbol = new VarSymbol(name, valueType, dimension);
+        return SymbolManager.getInstance().addAndCheck(varSymbol);
     }
 
     @Override

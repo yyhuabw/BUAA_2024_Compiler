@@ -2,6 +2,7 @@ package frontend.parser.ast.expression.primaryExp;
 
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.terminal.CharConst;
+import middle.symbol.value.ValueType;
 
 public class Character implements PrimaryExpEle {
     private final SyntaxType type;
@@ -10,6 +11,16 @@ public class Character implements PrimaryExpEle {
     public Character(CharConst charConst) {
         this.type = SyntaxType.CHARACTER;
         this.charConst = charConst;
+    }
+
+    @Override
+    public ValueType getValueType() {
+        return ValueType.CHAR;
+    }
+
+    @Override
+    public int getDim() {
+        return 0;
     }
 
     @Override

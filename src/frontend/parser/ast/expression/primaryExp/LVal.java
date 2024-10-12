@@ -4,6 +4,7 @@ import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.expression.single.Exp;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
@@ -20,6 +21,31 @@ public class LVal implements PrimaryExpEle {
         this.leftBrackets = leftBrackets;
         this.exps = exps;
         this.rightBrackets = rightBrackets;
+    }
+
+    public boolean isConst() {
+        return ident.queryIsConst();
+    }
+
+    public int getLineno() {
+        return ident.getLineno();
+    }
+
+    @Override
+    public ValueType getValueType() {
+        return ident.queryValueType(false);
+    }
+
+    @Override
+    public int getDim() {
+        int dimension = ident.queryDim(false);
+        if (dimension < 0) { // undefined ident
+            return -1;
+        }
+        if (dimension > 0 && leftBrackets.isEmpty()) { // array
+            return dimension;
+        }
+        return 0;
     }
 
     @Override

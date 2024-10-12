@@ -5,6 +5,8 @@ import frontend.parser.ast.expression.single.Exp;
 import frontend.parser.ast.terminal.StringConst;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PrintfStmt implements StmtEle {
     private final Token printfTk;
@@ -37,6 +39,21 @@ public class PrintfStmt implements StmtEle {
         this(printfTk, leftParent, stringConst, rightParent, semicolon);
         this.commas = commas;
         this.exps = exps;
+    }
+
+    public boolean isWrongFormat() {
+        Pattern pattern = Pattern.compile("%[dc]");
+        Matcher matcher = pattern.matcher(stringConst.getContent());
+        int cnt = 0;
+        while (matcher.find()) {
+            cnt++;
+        }
+
+        return exps.size() != cnt;
+    }
+
+    public int getLineno() {
+        return printfTk.getLineno();
     }
 
     @Override

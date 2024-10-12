@@ -3,6 +3,7 @@ package frontend.parser.ast.function.single;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.symbol.VarSymbol;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,15 @@ public class FuncFParams implements SyntaxNode {
         this(first);
         this.commas = commas;
         this.funcFParams = funcFParams;
+    }
+
+    public ArrayList<VarSymbol> getSymbols() {
+        ArrayList<VarSymbol> symbols = new ArrayList<>();
+        symbols.add(first.getSymbol());
+        for (FuncFParam funcFParam : funcFParams) {
+            symbols.add(funcFParam.getSymbol());
+        }
+        return symbols;
     }
 
     @Override

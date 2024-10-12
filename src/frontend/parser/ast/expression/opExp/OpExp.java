@@ -7,10 +7,10 @@ import frontend.parser.ast.SyntaxType;
 import java.util.ArrayList;
 
 public class OpExp<T extends SyntaxNode> implements SyntaxNode {
-    private final SyntaxType type;
-    private final T first;
-    private final ArrayList<Token> operators;
-    private final ArrayList<T> operands;
+    protected final SyntaxType type;
+    protected final T first;
+    protected final ArrayList<Token> operators;
+    protected final ArrayList<T> operands;
 
     public OpExp(SyntaxType type, T first, ArrayList<Token> operators, ArrayList<T> operands) {
         this.type = type;

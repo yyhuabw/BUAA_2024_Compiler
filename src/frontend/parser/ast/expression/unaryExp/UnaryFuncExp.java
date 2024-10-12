@@ -3,6 +3,7 @@ package frontend.parser.ast.expression.unaryExp;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.FuncRParams;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.value.ValueType;
 
 public class UnaryFuncExp implements UnaryExpEle {
     private final Ident ident;
@@ -19,6 +20,16 @@ public class UnaryFuncExp implements UnaryExpEle {
     public UnaryFuncExp(Ident ident, Token leftParent, FuncRParams funcRParams, Token rightParent) {
         this(ident, leftParent, rightParent);
         this.funcRParams = funcRParams;
+    }
+
+    @Override
+    public ValueType getValueType() {
+        return ident.queryValueType(true);
+    }
+
+    @Override
+    public int getDim() {
+        return ident.queryDim(true);
     }
 
     @Override

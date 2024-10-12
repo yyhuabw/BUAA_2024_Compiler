@@ -6,6 +6,12 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.function.funcType.FuncType;
 import frontend.parser.ast.statement.block.Block;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.FuncSymbol;
+import middle.symbol.SymbolManager;
+import middle.symbol.VarSymbol;
+import middle.symbol.value.ValueType;
+
+import java.util.ArrayList;
 
 public class FuncDef implements SyntaxNode {
     private final SyntaxType type;
@@ -37,6 +43,17 @@ public class FuncDef implements SyntaxNode {
                    Block block) {
         this(funcType, ident, leftParent, rightParent, block);
         this.funcFParams = funcFParams;
+    }
+
+    public boolean addToSTAndCheck() {
+        String name = ident.getToken().getContent();
+        ValueType returnType = funcType.getReturnType();
+        ArrayList<VarSymbol> symbols = new ArrayList<>();
+        if (funcFParams != null) {
+            symbols = funcFParams.getSymbols();
+        }
+        FuncSymbol funcSymbol = new FuncSymbol(name, returnType, symbols);
+        return SymbolManager.getInstance().addAndCheck(funcSymbol);
     }
 
     @Override

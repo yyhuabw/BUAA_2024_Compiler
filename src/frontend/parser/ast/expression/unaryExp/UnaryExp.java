@@ -2,6 +2,7 @@ package frontend.parser.ast.expression.unaryExp;
 
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.symbol.value.ValueType;
 
 public class UnaryExp implements SyntaxNode {
     private final SyntaxType type;
@@ -10,6 +11,14 @@ public class UnaryExp implements SyntaxNode {
     public UnaryExp(UnaryExpEle unaryExpEle) {
         this.type = SyntaxType.UNARY_EXP;
         this.unaryExpEle = unaryExpEle;
+    }
+
+    public ValueType getValueType() {
+        return unaryExpEle.getValueType();
+    }
+
+    public int getDim() {
+        return unaryExpEle.getDim();
     }
 
     @Override

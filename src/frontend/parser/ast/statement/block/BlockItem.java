@@ -9,6 +9,10 @@ public class BlockItem implements SyntaxNode {
         this.blockItemEle = blockItemEle;
     }
 
+    public BlockItemEle getBlockItemEle() {
+        return blockItemEle;
+    }
+
     @Override
     public String syntaxInfoOutput() {
         return blockItemEle.syntaxInfoOutput();

@@ -6,6 +6,9 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.type.BType;
 import frontend.parser.ast.expression.single.ConstExp;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.SymbolManager;
+import middle.symbol.VarSymbol;
+import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
@@ -19,6 +22,7 @@ public class FuncFParam implements SyntaxNode {
     private ArrayList<Token> leftBrackets = null;
     private ArrayList<ConstExp> constExps = null;
     private ArrayList<Token> rightBrackets = null;
+    private VarSymbol symbol = null;
 
     public FuncFParam(BType bType, Ident ident) {
         this.type = SyntaxType.FUNC_FORMAL_PARAM;
@@ -46,6 +50,25 @@ public class FuncFParam implements SyntaxNode {
         this.leftBrackets = leftBrackets;
         this.constExps = constExps;
         this.rightBrackets = rightBrackets;
+    }
+
+    public boolean addToSTAndCheck() {
+        String name = ident.getToken().getContent();
+        ValueType valueType = bType.getValueType();
+
+        int dimension = 0;
+        if (firstLeftBracket != null) {
+            dimension++;
+            dimension += leftBrackets.size();
+        }
+
+        VarSymbol varSymbol = new VarSymbol(name, valueType, dimension);
+        this.symbol = varSymbol;
+        return SymbolManager.getInstance().addAndCheck(varSymbol);
+    }
+
+    public VarSymbol getSymbol() {
+        return symbol;
     }
 
     @Override

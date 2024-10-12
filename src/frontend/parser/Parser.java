@@ -46,6 +46,11 @@ import frontend.parser.ast.terminal.StringConst;
 import middle.error.Error;
 import middle.error.ErrorTable;
 import middle.error.ErrorType;
+import middle.symbol.FuncSymbol;
+import middle.symbol.Symbol;
+import middle.symbol.SymbolManager;
+import middle.symbol.VarSymbol;
+import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
@@ -118,6 +123,8 @@ public class Parser {
         ArrayList<FuncDef> funcDefs = new ArrayList<>();
         MainFuncDef mainFuncDef = null;
 
+        SymbolManager.getInstance().enterScope(); // enter Scope
+
         while (true) {
             if (curToken == null) {
                 break;
@@ -135,6 +142,8 @@ public class Parser {
             }
         }
 
+        SymbolManager.getInstance().leaveScope(); // leave Scope
+
         return new CompUnit(decls, funcDefs, mainFuncDef);
     }
 
@@ -144,7 +153,7 @@ public class Parser {
 
         switch (curToken.getType()) {
             case SEMICN -> stmtEle = parseNullStmt();
-            case LBRACE -> stmtEle = parseBlock();
+            case LBRACE -> stmtEle = parseBlock(true);
             case IFTK -> stmtEle = parseIfStmt();
             case FORTK -> stmtEle = parseForLoopStmt();
             case BREAKTK -> stmtEle = parseBreakStmt();
@@ -188,6 +197,7 @@ public class Parser {
 
     public AssignStmt parseAssignStmt() {
         LVal lVal = parseLVal();
+        handleHError(lVal);
 
         Token assign = getCurToken();
         read();
@@ -265,7 +275,9 @@ public class Parser {
         Token rightParent = getCurToken();
         read();
 
+        SymbolManager.getInstance().enterLoop(); // enter loop
         Stmt stmt = parseStmt();
+        SymbolManager.getInstance().leaveLoop(); // leave loop
 
         return new ForLoopStmt(forTk, leftParent, forStmt1, semicolon1, cond, semicolon2, forStmt2, rightParent, stmt);
     }
@@ -274,6 +286,7 @@ public class Parser {
         Token breakTk = getCurToken();
         read();
         Token semicolon = handleIError();
+        handleMError(breakTk);
         return new BreakStmt(breakTk, semicolon);
     }
 
@@ -281,6 +294,7 @@ public class Parser {
         Token continueTk = getCurToken();
         read();
         Token semicolon = handleIError();
+        handleMError(continueTk);
         return new ContinueStmt(continueTk, semicolon);
     }
 
@@ -290,6 +304,7 @@ public class Parser {
 
         if (curInExpFirstSet()) {
             Exp exp = parseExp();
+            handleFError(returnTk);
             Token semicolon = handleIError();
             return new ReturnStmt(returnTk, exp, semicolon);
         }
@@ -299,6 +314,7 @@ public class Parser {
 
     public GetintStmt parseGetintStmt() {
         LVal lVal = parseLVal();
+        handleHError(lVal);
 
         Token assign = getCurToken();
         read();
@@ -318,6 +334,7 @@ public class Parser {
 
     public GetcharStmt parseGetcharStmt() {
         LVal lVal = parseLVal();
+        handleHError(lVal);
 
         Token assign = getCurToken();
         read();
@@ -357,11 +374,15 @@ public class Parser {
 
         Token semicolon = handleIError();
 
-        return new PrintfStmt(printfTk, leftParent, stringConst, commas, exps, rightParent, semicolon);
+        PrintfStmt printfStmt = new PrintfStmt(printfTk, leftParent, stringConst, commas, exps, rightParent, semicolon);
+        handleLError(printfStmt);
+
+        return printfStmt;
     }
 
     public ForStmt parseForStmt() {
         LVal lVal = parseLVal();
+        handleHError(lVal);
         Token assign = getCurToken();
         read();
         Exp exp = parseExp();
@@ -369,8 +390,12 @@ public class Parser {
     }
 
     // block
-    public Block parseBlock() {
+    public Block parseBlock(boolean needEnterScope) {
         ArrayList<BlockItem> blockItems = new ArrayList<>();
+
+        if (needEnterScope) {
+            SymbolManager.getInstance().enterScope(); // enter block
+        }
 
         Token leftBrace = getCurToken();
         read();
@@ -381,6 +406,10 @@ public class Parser {
 
         Token rightBrace = getCurToken();
         read();
+
+        if (needEnterScope) {
+            SymbolManager.getInstance().leaveScope(); // leave block
+        }
 
         return new Block(leftBrace, blockItems, rightBrace);
     }
@@ -458,12 +487,12 @@ public class Parser {
 
         BType bType = parseBType();
 
-        ConstDef first = parseConstDef();
+        ConstDef first = parseConstDef(bType.getValueType());
 
         while (curEquals(TokenType.COMMA)) {
             commas.add(getCurToken());
             read();
-            constDefs.add(parseConstDef());
+            constDefs.add(parseConstDef(bType.getValueType()));
         }
 
         // handle type i error
@@ -472,7 +501,7 @@ public class Parser {
         return new ConstDecl(constTk, bType, first, commas, constDefs, semicolon);
     }
 
-    public ConstDef parseConstDef() {
+    public ConstDef parseConstDef(ValueType valueType) {
         ArrayList<Token> leftBrackets = new ArrayList<>();
         ArrayList<ConstExp> constExps = new ArrayList<>();
         ArrayList<Token> rightBrackets = new ArrayList<>();
@@ -492,11 +521,16 @@ public class Parser {
 
         ConstInitVal constInitVal = parseConstInitVal();
 
-        return new ConstDef(ident, leftBrackets, constExps, rightBrackets, assign, constInitVal);
+        ConstDef constDef = new ConstDef(ident, leftBrackets, constExps, rightBrackets, assign, constInitVal);
+        if (constDef.addToSTAndCheck(valueType)) { // b error
+            handleBError(ident.getLineno());
+        }
+
+        return constDef;
     }
 
     // variable
-    public VarDef parseVarDef() {
+    public VarDef parseVarDef(ValueType valueType) {
         VarDefEle varDefEle;
         ArrayList<Token> leftBrackets = new ArrayList<>();
         ArrayList<ConstExp> constExps = new ArrayList<>();
@@ -516,9 +550,18 @@ public class Parser {
             Token assign = getCurToken();
             read();
             InitVal initVal = parseInitVal();
-            varDefEle = new VarInitDef(ident, leftBrackets, constExps, rightBrackets, assign, initVal);
+
+            VarInitDef varInitDef = new VarInitDef(ident, leftBrackets, constExps, rightBrackets, assign, initVal);
+            if (varInitDef.addToSTAndCheck(valueType)) { // b error
+                handleBError(ident.getLineno());
+            }
+            varDefEle = varInitDef;
         } else {
-            varDefEle = new VarNotInitDef(ident, leftBrackets, constExps, rightBrackets);
+            VarNotInitDef varNotInitDef = new VarNotInitDef(ident, leftBrackets, constExps, rightBrackets);
+            if (varNotInitDef.addToSTAndCheck(valueType)) {
+                handleBError(ident.getLineno());
+            }
+            varDefEle = varNotInitDef;
         }
 
         return new VarDef(varDefEle);
@@ -568,12 +611,12 @@ public class Parser {
 
         BType bType = parseBType();
 
-        VarDef first = parseVarDef();
+        VarDef first = parseVarDef(bType.getValueType());
 
         while (curEquals(TokenType.COMMA)) {
             commas.add(getCurToken());
             read();
-            varDefs.add(parseVarDef());
+            varDefs.add(parseVarDef(bType.getValueType()));
         }
 
         // handle type i error
@@ -617,6 +660,9 @@ public class Parser {
 
         Ident ident = parseIdent();
 
+        // add func copy to SymbolTable's curFunc
+        SymbolManager.getInstance().enterFuncDef(new FuncSymbol(ident.getToken().getContent(), funcType.getReturnType(), new ArrayList<>())); // enter funcDef Scope
+
         Token leftParent = getCurToken();
         read();
 
@@ -627,9 +673,18 @@ public class Parser {
 
         Token rightParent = handleJError();
 
-        Block block = parseBlock();
+        Block block = parseBlock(false);
 
-        return new FuncDef(funcType, ident, leftParent, funcFParams, rightParent, block);
+        FuncDef funcDef = new FuncDef(funcType, ident, leftParent, funcFParams, rightParent, block);
+        if (funcDef.addToSTAndCheck()) {
+            handleBError(ident.getLineno());
+        }
+
+        handleGError(funcType.getReturnType(), block);
+
+        SymbolManager.getInstance().leaveFuncDef(); // leave funcDef Scope
+
+        return funcDef;
     }
 
     public MainFuncDef parseMainFuncDef() {
@@ -644,7 +699,14 @@ public class Parser {
 
         Token rightParent = handleJError();
 
-        Block block = parseBlock();
+        // add func copy to SymbolTable's curFunc
+        SymbolManager.getInstance().enterFuncDef(new FuncSymbol("main", ValueType.INT, new ArrayList<>())); // enter funcDef Scope
+
+        Block block = parseBlock(false);
+
+        handleGError(ValueType.INT, block);
+
+        SymbolManager.getInstance().leaveFuncDef(); // leave funcDef Scope
 
         return new MainFuncDef(intTk, mainTk, leftParent, rightParent, block);
     }
@@ -669,6 +731,7 @@ public class Parser {
 
         Ident ident = parseIdent();
 
+        FuncFParam funcFParam;
         if (curEquals(TokenType.LBRACK)) {
             Token firstLeftBracket = getCurToken();
             read();
@@ -690,9 +753,15 @@ public class Parser {
                 rightBrackets.add(rightBracket);
             }
 
-            return new FuncFParam(bType, ident, firstLeftBracket, firstRightBracket, leftBrackets, constExps, rightBrackets);
+            funcFParam = new FuncFParam(bType, ident, firstLeftBracket, firstRightBracket, leftBrackets, constExps, rightBrackets);
+        } else {
+            funcFParam =  new FuncFParam(bType, ident);
         }
-        return new FuncFParam(bType, ident);
+
+        if (funcFParam.addToSTAndCheck()) {
+            handleBError(ident.getLineno());
+        }
+        return funcFParam;
     }
 
     // expression
@@ -842,11 +911,15 @@ public class Parser {
     public UnaryFuncExp parseUnaryFuncExp() {
         Ident ident = parseIdent();
 
+        handleCError(ident, true);
+
         Token leftParent = getCurToken();
         read();
 
         if (curInExpFirstSet()) {
             FuncRParams funcRParams = parseFuncRParams();
+            handleDError(ident, funcRParams);
+            handleEError(ident, funcRParams);
             Token rightParent = handleJError();
             return new UnaryFuncExp(ident, leftParent, funcRParams, rightParent);
         }
@@ -895,6 +968,8 @@ public class Parser {
         ArrayList<Token> rightBrackets = new ArrayList<>();
 
         Ident ident = parseIdent();
+
+        handleCError(ident, false);
 
         while (curEquals(TokenType.LBRACK)) {
             leftBrackets.add(getCurToken());
@@ -977,5 +1052,100 @@ public class Parser {
             rightBracket = new Token(TokenType.RBRACK, "", lineno);
         }
         return rightBracket;
+    }
+
+    private void handleBError(int lineno) {
+        addError(ErrorType.REDEFINED_IDENT, lineno);
+    }
+
+    private void handleCError(Ident ident, boolean isFuncSymbol) {
+        if (SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), isFuncSymbol) == null) {
+            addError(ErrorType.UNDEFINED_IDENT, ident.getLineno());
+        }
+    }
+
+    private void handleDError(Ident ident, FuncRParams funcRParams) {
+        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), true);
+        if (!(symbol instanceof FuncSymbol funcSymbol)) {
+            return; // undefined ident
+        }
+        if ((funcRParams == null && funcSymbol.getParamsSize() == 0)
+                || (funcRParams != null && (funcSymbol.getParamsSize() == funcRParams.getParamsSize()))) {
+            return;
+        }
+        addError(ErrorType.PARAM_NUM_MISMATCH, ident.getLineno());
+    }
+
+    private void handleEError(Ident ident, FuncRParams funcRParams) {
+        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), true);
+        if (!(symbol instanceof FuncSymbol funcSymbol)) {
+            return; // undefined ident
+        }
+        if (funcRParams != null && funcSymbol.getParamsSize() == funcRParams.getParamsSize()) {
+            ArrayList<Exp> exps = funcRParams.getAllExps();
+            ArrayList<VarSymbol> varSymbols = funcSymbol.getSymbols();
+            for (int i = 0; i < funcSymbol.getParamsSize(); i++) {
+                Exp exp = exps.get(i);
+                int expDim = exp.getDim();
+                VarSymbol varSymbol = varSymbols.get(i);
+
+                if (expDim < 0) { // undefined ident
+                    return;
+                }
+
+                if (expDim != varSymbol.getDim()) { // array <-> int
+                    addError(ErrorType.PARAM_TYPE_MISMATCH, ident.getLineno());
+                    return;
+                }
+
+                // exp.getDim() == varSymbol.getDim()
+                if (expDim > 0
+                        && !exp.getValueType().equals(varSymbol.getValueType())) { // int array <-> char array
+                    addError(ErrorType.PARAM_TYPE_MISMATCH, ident.getLineno());
+                    return;
+                }
+            }
+        }
+    }
+
+    private void handleFError(Token token) {
+        if (SymbolManager.getInstance().getCurFunc().getReturnType().equals(ValueType.VOID)) {
+            addError(ErrorType.VOID_MISMATCH_RETURN, token.getLineno());
+        }
+    }
+
+    private void handleGError(ValueType returnType, Block block) {
+        ArrayList<BlockItem> blockItems = block.getBlockItems();
+        if (blockItems.isEmpty()) {
+            addError(ErrorType.MISSING_RETURN, block.getRightBraceLineno());
+            return;
+        }
+        BlockItemEle lastBlockItemEle = blockItems.get(blockItems.size() - 1).getBlockItemEle();
+        if (lastBlockItemEle instanceof Stmt stmt) {
+            if (stmt.getStmtEle() instanceof ReturnStmt) {
+                return;
+            }
+        }
+        if (!returnType.equals(ValueType.VOID)) {
+            addError(ErrorType.MISSING_RETURN, block.getRightBraceLineno());
+        }
+    }
+
+    private void handleHError(LVal lVal) {
+        if (lVal.isConst()) {
+            addError(ErrorType.ALTER_CONST, lVal.getLineno());
+        }
+    }
+
+    private void handleLError(PrintfStmt printfStmt) {
+        if (printfStmt.isWrongFormat()) {
+            addError(ErrorType.PRINTF_FORMAT_MISMATCH, printfStmt.getLineno());
+        }
+    }
+
+    private void handleMError(Token token) {
+        if (SymbolManager.getInstance().notInLoop()) {
+            addError(ErrorType.MISUSE_BREAK_OR_CONTINUE, token.getLineno());
+        }
     }
 }

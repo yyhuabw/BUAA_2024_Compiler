@@ -12,6 +12,10 @@ public class Stmt implements BlockItemEle {
         this.stmtEle = stmtEle;
     }
 
+    public StmtEle getStmtEle() {
+        return stmtEle;
+    }
+
     @Override
     public String syntaxInfoOutput() {
         return stmtEle.syntaxInfoOutput() + type.getName() + "\n";

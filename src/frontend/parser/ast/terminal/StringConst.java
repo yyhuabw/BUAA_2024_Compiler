@@ -11,6 +11,10 @@ public class StringConst implements ConstInitValEle, InitValEle {
         this.token = token;
     }
 
+    public String getContent() {
+        return token.getContent();
+    }
+
     @Override
     public String syntaxInfoOutput() {
         return token.syntaxInfoOutput();

@@ -6,6 +6,9 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitVal;
 import frontend.parser.ast.expression.single.ConstExp;
 import frontend.parser.ast.terminal.Ident;
+import middle.symbol.ConstSymbol;
+import middle.symbol.SymbolManager;
+import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
@@ -31,6 +34,13 @@ public class ConstDef implements SyntaxNode {
         this.leftBrackets = leftBrackets;
         this.constExps = constExps;
         this.rightBrackets = rightBrackets;
+    }
+
+    public boolean addToSTAndCheck(ValueType valueType) {
+        String name = ident.getToken().getContent();
+        int dimension = leftBrackets.size();
+        ConstSymbol constSymbol = new ConstSymbol(name, valueType, dimension);
+        return SymbolManager.getInstance().addAndCheck(constSymbol);
     }
 
     @Override
