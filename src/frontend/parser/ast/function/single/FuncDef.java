@@ -8,51 +8,40 @@ import frontend.parser.ast.statement.block.Block;
 import frontend.parser.ast.terminal.Ident;
 import middle.symbol.FuncSymbol;
 import middle.symbol.SymbolManager;
-import middle.symbol.VarSymbol;
 import middle.symbol.value.ValueType;
-
-import java.util.ArrayList;
 
 public class FuncDef implements SyntaxNode {
     private final SyntaxType type;
     private final FuncType funcType;
     private final Ident ident;
-    private final Token leftParent;
+    private Token leftParent;
     private FuncFParams funcFParams = null;
-    private final Token rightParent;
-    private final Block block;
+    private Token rightParent;
+    private Block block;
+    private FuncSymbol funcSymbol = null;
 
-    public FuncDef(FuncType funcType,
-                   Ident ident,
-                   Token leftParent,
-                   Token rightParent,
-                   Block block) {
+    public FuncDef(FuncType funcType, Ident ident) {
         this.type = SyntaxType.FUNC_DEF;
         this.funcType = funcType;
         this.ident = ident;
+    }
+
+    public void setAttributes(Token leftParent, Token rightParent, Block block) {
         this.leftParent = leftParent;
         this.rightParent = rightParent;
         this.block = block;
     }
 
-    public FuncDef(FuncType funcType,
-                   Ident ident,
-                   Token leftParent,
-                   FuncFParams funcFParams,
-                   Token rightParent,
-                   Block block) {
-        this(funcType, ident, leftParent, rightParent, block);
+    public void setFuncFParams(FuncFParams funcFParams) {
         this.funcFParams = funcFParams;
+        funcSymbol.setSymbols(funcFParams.getSymbols());
     }
 
     public boolean addToSTAndCheck() {
         String name = ident.getToken().getContent();
         ValueType returnType = funcType.getReturnType();
-        ArrayList<VarSymbol> symbols = new ArrayList<>();
-        if (funcFParams != null) {
-            symbols = funcFParams.getSymbols();
-        }
-        FuncSymbol funcSymbol = new FuncSymbol(name, returnType, symbols);
+        FuncSymbol funcSymbol = new FuncSymbol(name, returnType);
+        this.funcSymbol = funcSymbol;
         return SymbolManager.getInstance().addAndCheck(funcSymbol);
     }
 

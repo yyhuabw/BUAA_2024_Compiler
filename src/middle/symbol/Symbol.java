@@ -17,16 +17,8 @@ public class Symbol {
         this.scopeId = scopeId;
     }
 
-    public SymbolType getType() {
-        return type;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public int getScopeId() {
-        return scopeId;
     }
 
     public String symbolInfoOutput() {

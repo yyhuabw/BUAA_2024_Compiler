@@ -33,12 +33,12 @@ public class LVal implements PrimaryExpEle {
 
     @Override
     public ValueType getValueType() {
-        return ident.queryValueType(false);
+        return ident.queryValueType();
     }
 
     @Override
     public int getDim() {
-        int dimension = ident.queryDim(false);
+        int dimension = ident.queryDim();
         if (dimension < 0) { // undefined ident
             return -1;
         }

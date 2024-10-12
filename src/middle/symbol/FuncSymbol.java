@@ -6,12 +6,11 @@ import java.util.ArrayList;
 
 public class FuncSymbol extends Symbol {
     private final ValueType returnType;
-    private final ArrayList<VarSymbol> symbols; // Func Formal Params
+    private ArrayList<VarSymbol> symbols = new ArrayList<>(); // Func Formal Params
 
-    public FuncSymbol(String name, ValueType returnType, ArrayList<VarSymbol> symbols) {
+    public FuncSymbol(String name, ValueType returnType) {
         super(name);
         this.returnType = returnType;
-        this.symbols = symbols;
 
         setSymbolType();
     }
@@ -24,6 +23,10 @@ public class FuncSymbol extends Symbol {
         } else if (returnType.equals(ValueType.VOID)) {
             setType(SymbolType.VoidFunc);
         }
+    }
+
+    public void setSymbols(ArrayList<VarSymbol> symbols) {
+        this.symbols = symbols;
     }
 
     public ValueType getReturnType() {

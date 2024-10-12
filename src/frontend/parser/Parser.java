@@ -654,14 +654,19 @@ public class Parser {
     // function
     // FuncDef → FuncType Ident '(' [FuncFParams] ')' Block // j
     public FuncDef parseFuncDef() {
-        FuncFParams funcFParams = null;
+        FuncFParams funcFParams;
 
         FuncType funcType = parseFuncType();
 
         Ident ident = parseIdent();
 
+        FuncDef funcDef = new FuncDef(funcType, ident);
+        if (funcDef.addToSTAndCheck()) {
+            handleBError(ident.getLineno());
+        }
+
         // add func copy to SymbolTable's curFunc
-        SymbolManager.getInstance().enterFuncDef(new FuncSymbol(ident.getToken().getContent(), funcType.getReturnType(), new ArrayList<>())); // enter funcDef Scope
+        SymbolManager.getInstance().enterFuncDef(new FuncSymbol(ident.getToken().getContent(), funcType.getReturnType())); // enter funcDef Scope
 
         Token leftParent = getCurToken();
         read();
@@ -669,16 +674,14 @@ public class Parser {
         // the first set of FuncFParams is 'int' | 'char'
         if (curEquals(TokenType.INTTK) || curEquals(TokenType.CHARTK)) {
             funcFParams = parseFuncFParams();
+            funcDef.setFuncFParams(funcFParams);
         }
 
         Token rightParent = handleJError();
 
         Block block = parseBlock(false);
 
-        FuncDef funcDef = new FuncDef(funcType, ident, leftParent, funcFParams, rightParent, block);
-        if (funcDef.addToSTAndCheck()) {
-            handleBError(ident.getLineno());
-        }
+        funcDef.setAttributes(leftParent, rightParent, block); // refill
 
         handleGError(funcType.getReturnType(), block);
 
@@ -700,7 +703,7 @@ public class Parser {
         Token rightParent = handleJError();
 
         // add func copy to SymbolTable's curFunc
-        SymbolManager.getInstance().enterFuncDef(new FuncSymbol("main", ValueType.INT, new ArrayList<>())); // enter funcDef Scope
+        SymbolManager.getInstance().enterFuncDef(new FuncSymbol("main", ValueType.INT)); // enter funcDef Scope
 
         Block block = parseBlock(false);
 
@@ -911,7 +914,7 @@ public class Parser {
     public UnaryFuncExp parseUnaryFuncExp() {
         Ident ident = parseIdent();
 
-        handleCError(ident, true);
+        handleCError(ident);
 
         Token leftParent = getCurToken();
         read();
@@ -969,7 +972,7 @@ public class Parser {
 
         Ident ident = parseIdent();
 
-        handleCError(ident, false);
+        handleCError(ident);
 
         while (curEquals(TokenType.LBRACK)) {
             leftBrackets.add(getCurToken());
@@ -1058,14 +1061,14 @@ public class Parser {
         addError(ErrorType.REDEFINED_IDENT, lineno);
     }
 
-    private void handleCError(Ident ident, boolean isFuncSymbol) {
-        if (SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), isFuncSymbol) == null) {
+    private void handleCError(Ident ident) {
+        if (SymbolManager.getInstance().getSymbol(ident.getToken().getContent()) == null) {
             addError(ErrorType.UNDEFINED_IDENT, ident.getLineno());
         }
     }
 
     private void handleDError(Ident ident, FuncRParams funcRParams) {
-        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), true);
+        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent());
         if (!(symbol instanceof FuncSymbol funcSymbol)) {
             return; // undefined ident
         }
@@ -1077,7 +1080,7 @@ public class Parser {
     }
 
     private void handleEError(Ident ident, FuncRParams funcRParams) {
-        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent(), true);
+        Symbol symbol = SymbolManager.getInstance().getSymbol(ident.getToken().getContent());
         if (!(symbol instanceof FuncSymbol funcSymbol)) {
             return; // undefined ident
         }
@@ -1117,7 +1120,9 @@ public class Parser {
     private void handleGError(ValueType returnType, Block block) {
         ArrayList<BlockItem> blockItems = block.getBlockItems();
         if (blockItems.isEmpty()) {
-            addError(ErrorType.MISSING_RETURN, block.getRightBraceLineno());
+            if (!returnType.equals(ValueType.VOID)) {
+                addError(ErrorType.MISSING_RETURN, block.getRightBraceLineno());
+            }
             return;
         }
         BlockItemEle lastBlockItemEle = blockItems.get(blockItems.size() - 1).getBlockItemEle();

@@ -21,12 +21,12 @@ public class Ident implements SyntaxNode {
     }
 
     public boolean queryIsConst() { // symbolTable has or not
-        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent(), false);
+        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent());
         return symbol instanceof ConstSymbol;
     }
 
-    public ValueType queryValueType(boolean isFuncSymbol) { // symbolTable has or not
-        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent(), isFuncSymbol);
+    public ValueType queryValueType() { // symbolTable has or not
+        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent());
         if (symbol instanceof VarSymbol varSymbol) {
             return varSymbol.getValueType();
         } else if (symbol instanceof ConstSymbol constSymbol) {
@@ -37,8 +37,8 @@ public class Ident implements SyntaxNode {
         return null; // undefined ident
     }
 
-    public int queryDim(boolean isFuncSymbol) { // symbolTable has or not
-        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent(), isFuncSymbol);
+    public int queryDim() { // symbolTable has or not
+        Symbol symbol = SymbolManager.getInstance().getSymbol(token.getContent());
         if (symbol instanceof VarSymbol varSymbol) {
             return varSymbol.getDim();
         } else if (symbol instanceof ConstSymbol constSymbol) {

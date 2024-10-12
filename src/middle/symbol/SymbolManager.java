@@ -1,21 +1,18 @@
 package middle.symbol;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Stack;
 
 public class SymbolManager {
     private static final SymbolManager SYMBOL_MANAGER = new SymbolManager();
     private final Stack<SymbolTable> symbolTableStack;
-    private final ArrayList<Symbol> symbols; // all symbols for output
-    private int scopeId; // current scope number
+    private final ArrayList<SymbolTable> symbolTables; // all symbols for output
     private int loopDepth; // current loop layers
     private FuncSymbol curFunc; // current func copy, just for handling error, don't contain params
 
     private SymbolManager() {
         this.symbolTableStack = new Stack<>();
-        this.symbols = new ArrayList<>();
-        this.scopeId = 0;
+        this.symbolTables = new ArrayList<>();
         this.loopDepth = 0;
         this.curFunc = null;
     }
@@ -24,26 +21,19 @@ public class SymbolManager {
         return SYMBOL_MANAGER;
     }
 
-    public Symbol getSymbol(String name, boolean isFuncSymbol) {
-        return symbolTableStack.peek().getSymbolInScopes(name, isFuncSymbol);
+    public Symbol getSymbol(String name) {
+        return symbolTableStack.peek().getSymbolInScopes(name);
     }
 
     public boolean addAndCheck(Symbol symbol) {
         SymbolTable topTable = symbolTableStack.peek();
-        boolean isFuncSymbol = symbol instanceof FuncSymbol;
-        if (topTable.getSymbolThisScope(symbol.getName(), isFuncSymbol) != null) { // add fail
+        if (topTable.getSymbolThisScope(symbol.getName()) != null) { // add fail
             return true;
         }
 
         // add success
-        if (isFuncSymbol) {
-            symbolTableStack.get(0).addSymbol(symbol); // func def must in scope1
-            symbol.setScopeId(1);
-        } else {
-            symbolTableStack.peek().addSymbol(symbol);
-            symbol.setScopeId(scopeId);
-        }
-        symbols.add(symbol);
+        topTable.addSymbol(symbol);
+        symbol.setScopeId(symbolTables.indexOf(topTable) + 1);
         return false;
     }
 
@@ -53,7 +43,7 @@ public class SymbolManager {
             symbolTable.setParent(symbolTableStack.peek());
         }
         symbolTableStack.push(symbolTable);
-        scopeId++;
+        symbolTables.add(symbolTable);
     }
 
     public void leaveScope() {
@@ -87,13 +77,10 @@ public class SymbolManager {
     }
 
     public String symbolInfoOutput() {
-        symbols.sort(Comparator.comparingInt(Symbol::getScopeId));
-
         StringBuilder sb = new StringBuilder();
-        for (Symbol symbol : symbols) {
-            sb.append(symbol.symbolInfoOutput()).append("\n");
+        for (SymbolTable symbolTable : symbolTables) {
+            sb.append(symbolTable.symbolInfoOutput());
         }
-
         return sb.toString();
     }
 }

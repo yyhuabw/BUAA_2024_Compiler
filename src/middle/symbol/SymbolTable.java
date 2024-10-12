@@ -1,15 +1,16 @@
 package middle.symbol;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SymbolTable {
-    private final HashMap<String, Symbol> dataSymbols; // name -> symbol
-    private final HashMap<String, Symbol> funcSymbols; // name -> symbol
+    private final HashMap<String, Symbol> symbolMap; // name -> symbol
+    private final ArrayList<Symbol> symbols;
     private SymbolTable parent = null;
 
     public SymbolTable() {
-        this.dataSymbols = new HashMap<>();
-        this.funcSymbols = new HashMap<>();
+        this.symbolMap = new HashMap<>();
+        this.symbols = new ArrayList<>();
     }
 
     public boolean hasParent() {
@@ -21,42 +22,32 @@ public class SymbolTable {
     }
 
     public void addSymbol(Symbol symbol) {
-        if (symbol instanceof FuncSymbol) {
-            funcSymbols.put(symbol.getName(), symbol);
-        } else {
-            dataSymbols.put(symbol.getName(), symbol);
-        }
+        symbolMap.put(symbol.getName(), symbol);
+        symbols.add(symbol);
     }
 
-    public Symbol getSymbolThisScope(String name, boolean isFuncSymbol) {
-        if (isFuncSymbol) {
-            if (funcSymbols.containsKey(name)) {
-                return funcSymbols.get(name);
-            }
-        } else {
-            if (dataSymbols.containsKey(name)) {
-                return dataSymbols.get(name);
-            }
+    public Symbol getSymbolThisScope(String name) {
+        if (symbolMap.containsKey(name)) {
+            return symbolMap.get(name);
         }
         return null;
     }
 
-    public Symbol getSymbolInScopes(String name, boolean isFuncSymbol) {
-        if (isFuncSymbol) {
-            if (funcSymbols.containsKey(name)) {
-                return funcSymbols.get(name);
-            }
-            if (hasParent()) {
-                return parent.getSymbolInScopes(name, true);
-            }
-        } else {
-            if (dataSymbols.containsKey(name)) {
-                return dataSymbols.get(name);
-            }
-            if (hasParent()) {
-                return parent.getSymbolInScopes(name, false);
-            }
+    public Symbol getSymbolInScopes(String name) {
+        if (symbolMap.containsKey(name)) {
+            return symbolMap.get(name);
+        }
+        if (hasParent()) {
+            return parent.getSymbolInScopes(name);
         }
         return null;
+    }
+
+    public String symbolInfoOutput() {
+        StringBuilder sb = new StringBuilder();
+        for (Symbol symbol : symbols) {
+            sb.append(symbol.symbolInfoOutput()).append("\n");
+        }
+        return sb.toString();
     }
 }

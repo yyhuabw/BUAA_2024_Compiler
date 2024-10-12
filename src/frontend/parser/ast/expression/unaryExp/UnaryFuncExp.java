@@ -24,12 +24,12 @@ public class UnaryFuncExp implements UnaryExpEle {
 
     @Override
     public ValueType getValueType() {
-        return ident.queryValueType(true);
+        return ident.queryValueType();
     }
 
     @Override
     public int getDim() {
-        return ident.queryDim(true);
+        return ident.queryDim();
     }
 
     @Override
