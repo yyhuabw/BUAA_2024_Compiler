@@ -20,6 +20,9 @@ public class FuncRParams implements SyntaxNode {
     }
 
     public int getParamsSize() {
+        if (first == null) {
+            return 0;
+        }
         return 1 + commas.size();
     }
 

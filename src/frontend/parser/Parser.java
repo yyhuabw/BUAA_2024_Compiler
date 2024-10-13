@@ -919,15 +919,14 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
+        FuncRParams funcRParams = null;
         if (curInExpFirstSet()) {
-            FuncRParams funcRParams = parseFuncRParams();
-            handleDError(ident, funcRParams);
-            handleEError(ident, funcRParams);
-            Token rightParent = handleJError();
-            return new UnaryFuncExp(ident, leftParent, funcRParams, rightParent);
+            funcRParams = parseFuncRParams();
         }
+        handleDError(ident, funcRParams);
+        handleEError(ident, funcRParams);
         Token rightParent = handleJError();
-        return new UnaryFuncExp(ident, leftParent, rightParent);
+        return new UnaryFuncExp(ident, leftParent, funcRParams, rightParent);
     }
 
     public UnaryOpExp parseUnaryOpExp() {
