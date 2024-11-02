@@ -3,6 +3,7 @@ package frontend.parser.ast.expression.opExp;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.llvm_ir.IrValue;
 
 import java.util.ArrayList;
 
@@ -30,5 +31,10 @@ public class OpExp<T extends SyntaxNode> implements SyntaxNode {
             sb.append(type.getName()).append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public IrValue genIR() {
+        return null;
     }
 }

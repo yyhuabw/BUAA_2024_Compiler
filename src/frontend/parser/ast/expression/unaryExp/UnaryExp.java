@@ -2,6 +2,7 @@ package frontend.parser.ast.expression.unaryExp;
 
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.llvm_ir.IrValue;
 import middle.symbol.value.ValueType;
 
 public class UnaryExp implements SyntaxNode {
@@ -24,5 +25,10 @@ public class UnaryExp implements SyntaxNode {
     @Override
     public String syntaxInfoOutput() {
         return unaryExpEle.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    @Override
+    public IrValue genIR() {
+        return unaryExpEle.genIR();
     }
 }

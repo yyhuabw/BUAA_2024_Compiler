@@ -1,4 +1,4 @@
-package middle.llvm_ir.constant;
+package middle.llvm_ir.utils.constant;
 
 import middle.llvm_ir.type.IrType;
 
@@ -8,7 +8,7 @@ public class IrConstArray extends IrConstant {
     private final ArrayList<IrConstInt> values;
 
     public IrConstArray(IrType type, ArrayList<IrConstInt> values) {
-        super(type);
+        super(type, "array const");
         this.values = values;
     }
 

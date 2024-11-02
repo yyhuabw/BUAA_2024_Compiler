@@ -3,6 +3,7 @@ package frontend.parser.ast.expression.single;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.llvm_ir.IrValue;
 
 import java.util.ArrayList;
 
@@ -43,5 +44,14 @@ public class FuncRParams implements SyntaxNode {
         }
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * not use
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        return null;
     }
 }

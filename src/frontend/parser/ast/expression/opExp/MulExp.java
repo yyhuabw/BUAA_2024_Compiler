@@ -3,6 +3,10 @@ package frontend.parser.ast.expression.opExp;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.expression.unaryExp.UnaryExp;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.IrAluInstr;
+import middle.llvm_ir.instruction.IrInstruction;
 import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
@@ -53,5 +57,35 @@ public class MulExp extends OpExp<UnaryExp> {
             }
         }
         return 0;
+    }
+
+    // '*' | '/' | '%'
+    @Override
+    public IrValue genIR() {
+        IrValue operand1 = first.genIR();
+        IrValue operand2;
+        IrInstruction instruction;
+
+        for (int i = 0; i < operands.size(); i++) {
+            operand2 = operands.get(i).genIR();
+            switch (operators.get(i).getType()) {
+                case MULT:
+                    instruction = new IrAluInstr(IrBuilder.getInstance().getLocalVarName(), IrAluInstr.Op.mul, operand1, operand2);
+                    break;
+                case DIV:
+                    instruction = new IrAluInstr(IrBuilder.getInstance().getLocalVarName(), IrAluInstr.Op.sdiv, operand1, operand2);
+                    break;
+                case MOD:
+                    instruction = new IrAluInstr(IrBuilder.getInstance().getLocalVarName(), IrAluInstr.Op.srem, operand1, operand2);
+                    break;
+
+                default:
+                    System.out.println("Illegal operator in MulExp");
+                    return null;
+            }
+            operand1 = instruction;
+        }
+
+        return operand1;
     }
 }

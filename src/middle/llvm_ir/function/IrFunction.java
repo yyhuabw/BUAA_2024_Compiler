@@ -32,6 +32,10 @@ public class IrFunction extends IrUser {
         return returnType;
     }
 
+    public boolean isVoid() {
+        return returnType.isVoid();
+    }
+
     @Override
     public String irOutput() {
         String paramsInfo = params.stream().

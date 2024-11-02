@@ -13,6 +13,10 @@ public class IrArrayType extends IrType {
         return eleType;
     }
 
+    public int getEleNum() {
+        return eleNum;
+    }
+
     @Override
     public String irOutput() {
         return "[" + eleNum + " x " + eleType.irOutput() + "]";

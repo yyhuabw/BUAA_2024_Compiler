@@ -1,5 +1,6 @@
-package middle.llvm_ir;
+package middle.llvm_ir.utils;
 
+import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrArrayType;
 import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrPointerType;

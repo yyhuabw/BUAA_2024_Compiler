@@ -6,11 +6,8 @@ import middle.llvm_ir.instruction.IrInstruction;
 import middle.llvm_ir.type.IrType;
 
 public class IrZextInstr extends IrInstruction {
-    private final IrType finalType;
-
     public IrZextInstr(IrType finalType, String name, IrValue originValue) {
         super(finalType, name, IrInstrType.ZEXT);
-        this.finalType = finalType;
         addOperand(originValue);
     }
 
@@ -23,6 +20,6 @@ public class IrZextInstr extends IrInstruction {
         return getName() + " = zext " +
                 getOriginValue().getType().irOutput() + " " +
                 getOriginValue().getName() + " to " +
-                finalType.irOutput() + "\n";
+                getType().irOutput() + "\n";
     }
 }

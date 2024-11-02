@@ -1,6 +1,6 @@
 package middle.llvm_ir.instruction.jump.io;
 
-import middle.llvm_ir.IrStrLiteral;
+import middle.llvm_ir.utils.IrStrLiteral;
 import middle.llvm_ir.type.IrPointerType;
 import middle.llvm_ir.type.IrVoidType;
 

@@ -2,6 +2,8 @@ package middle.llvm_ir;
 
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.type.IrModuleType;
+import middle.llvm_ir.utils.IrGlobalVar;
+import middle.llvm_ir.utils.IrStrLiteral;
 
 import java.util.ArrayList;
 

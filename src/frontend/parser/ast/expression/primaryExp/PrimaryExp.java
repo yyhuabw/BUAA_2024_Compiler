@@ -2,6 +2,7 @@ package frontend.parser.ast.expression.primaryExp;
 
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.expression.unaryExp.UnaryExpEle;
+import middle.llvm_ir.IrValue;
 import middle.symbol.value.ValueType;
 
 public class PrimaryExp implements UnaryExpEle {
@@ -26,5 +27,10 @@ public class PrimaryExp implements UnaryExpEle {
     @Override
     public String syntaxInfoOutput() {
         return primaryExpEle.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    @Override
+    public IrValue genIR() {
+        return primaryExpEle.genIR();
     }
 }

@@ -2,6 +2,7 @@ package frontend.parser.ast.expression.primaryExp;
 
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.terminal.IntConst;
+import middle.llvm_ir.IrValue;
 import middle.symbol.value.ValueType;
 
 public class Number implements PrimaryExpEle {
@@ -26,5 +27,10 @@ public class Number implements PrimaryExpEle {
     @Override
     public String syntaxInfoOutput() {
         return intConst.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    @Override
+    public IrValue genIR() {
+        return intConst.genIR();
     }
 }

@@ -6,11 +6,8 @@ import middle.llvm_ir.instruction.IrInstruction;
 import middle.llvm_ir.type.IrType;
 
 public class IrTruncInstr extends IrInstruction {
-    private final IrType finalType;
-
     public IrTruncInstr(IrType finalType, String name, IrValue originValue) {
         super(finalType, name, IrInstrType.TRUNC);
-        this.finalType = finalType;
         addOperand(originValue);
     }
 
@@ -23,6 +20,6 @@ public class IrTruncInstr extends IrInstruction {
         return getName() + " = trunc " +
                 getOriginValue().getType().irOutput() + " " +
                 getOriginValue().getName() + " to " +
-                finalType.irOutput() + "\n";
+                getType().irOutput() + "\n";
     }
 }

@@ -1,6 +1,7 @@
-package middle.llvm_ir;
+package middle.llvm_ir.utils;
 
-import middle.llvm_ir.constant.IrConstant;
+import middle.llvm_ir.IrUser;
+import middle.llvm_ir.utils.constant.IrConstant;
 import middle.llvm_ir.type.IrType;
 
 public class IrGlobalVar extends IrUser {

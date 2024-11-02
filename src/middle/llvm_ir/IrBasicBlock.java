@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class IrBasicBlock extends IrUser {
     private final ArrayList<IrInstruction> instrList;
-    private final IrFunction parentFunc;
+    private IrFunction parentFunc = null;
 
     /**
      * @param name: the label of basicBlock
@@ -16,11 +16,14 @@ public class IrBasicBlock extends IrUser {
     public IrBasicBlock(String name) {
         super(IrLabelType.LABEL, name);
         this.instrList = new ArrayList<>();
-        this.parentFunc = null;
     }
 
     public void addInstr(IrInstruction instr) {
         instrList.add(instr);
+    }
+
+    public void setParentFunc(IrFunction parentFunc) {
+        this.parentFunc = parentFunc;
     }
 
     @Override

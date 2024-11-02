@@ -1,9 +1,17 @@
 package frontend.parser.ast.expression.unaryExp;
 
 import frontend.lexer.token.Token;
+import frontend.parser.ast.expression.single.Exp;
 import frontend.parser.ast.expression.single.FuncRParams;
 import frontend.parser.ast.terminal.Ident;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.function.IrFunction;
+import middle.llvm_ir.instruction.jump.call.IrCallValInstr;
+import middle.llvm_ir.instruction.jump.call.IrCallVoidInstr;
 import middle.symbol.value.ValueType;
+
+import java.util.ArrayList;
 
 public class UnaryFuncExp implements UnaryExpEle {
     private final Ident ident;
@@ -42,5 +50,25 @@ public class UnaryFuncExp implements UnaryExpEle {
         }
         sb.append(rightParent.syntaxInfoOutput());
         return sb.toString();
+    }
+
+    @Override
+    public IrValue genIR() {
+        IrFunction irFunction = (IrFunction) ident.genIR();
+        ArrayList<IrValue> params = new ArrayList<>();
+
+        if (funcRParams != null) {
+            ArrayList<Exp> exps = funcRParams.getAllExps();
+            for (Exp exp : exps) {
+                params.add(exp.genIR());
+            }
+        }
+
+        String name = IrBuilder.getInstance().getFuncName(irFunction.getName());
+        if (irFunction.isVoid()) {
+            return new IrCallVoidInstr(name, irFunction, params);
+        } else {
+            return new IrCallValInstr(name, irFunction, params);
+        }
     }
 }

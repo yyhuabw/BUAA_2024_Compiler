@@ -2,6 +2,9 @@ package frontend.parser.ast.declaration.constant.constInitVal;
 
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.ConstExp;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.type.IrArrayType;
+import middle.llvm_ir.utils.constant.IrConstArray;
 
 import java.util.ArrayList;
 
@@ -41,5 +44,17 @@ public class ConstArrayInitVal implements ConstInitValEle {
         }
         sb.append(rightBrace.syntaxInfoOutput());
         return sb.toString();
+    }
+
+    /**
+     * not use
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        return null;
+    }
+
+    public IrConstArray genIR(IrArrayType type) {
     }
 }

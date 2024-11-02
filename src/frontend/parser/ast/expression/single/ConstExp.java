@@ -3,6 +3,7 @@ package frontend.parser.ast.expression.single;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitValEle;
 import frontend.parser.ast.expression.opExp.AddExp;
+import middle.llvm_ir.IrValue;
 
 public class ConstExp implements ConstInitValEle {
     private final SyntaxType type;
@@ -16,5 +17,10 @@ public class ConstExp implements ConstInitValEle {
     @Override
     public String syntaxInfoOutput() {
         return addExp.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    @Override
+    public IrValue genIR() {
+        return addExp.genIR();
     }
 }

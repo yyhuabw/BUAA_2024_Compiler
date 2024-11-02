@@ -1,5 +1,6 @@
 package middle.symbol;
 
+import middle.llvm_ir.function.IrFunction;
 import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 public class FuncSymbol extends Symbol {
     private final ValueType returnType;
     private ArrayList<VarSymbol> symbols = new ArrayList<>(); // Func Formal Params
+    private IrFunction irFunction;
 
     public FuncSymbol(String name, ValueType returnType) {
         super(name);
@@ -29,6 +31,10 @@ public class FuncSymbol extends Symbol {
         this.symbols = symbols;
     }
 
+    public void setIrFunction(IrFunction function) {
+        this.irFunction = function;
+    }
+
     public ValueType getReturnType() {
         return returnType;
     }
@@ -39,5 +45,9 @@ public class FuncSymbol extends Symbol {
 
     public ArrayList<VarSymbol> getSymbols() {
         return symbols;
+    }
+
+    public IrFunction getIrFunction() {
+        return irFunction;
     }
 }

@@ -1,7 +1,6 @@
 import frontend.lexer.Lexer;
 import frontend.parser.Parser;
 import middle.error.ErrorTable;
-import middle.symbol.SymbolManager;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,7 +23,7 @@ public class Compiler {
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
             try (OutputStream errStream = new FileOutputStream(errorFileName)) {
                 if (errorTable.isEmpty()) {
-                    outputStream.write(SymbolManager.getInstance().symbolInfoOutput().getBytes());
+                    outputStream.write();
                 } else {
                     errStream.write(errorTable.toString().getBytes());
                 }
