@@ -1,6 +1,7 @@
 package middle.llvm_ir;
 
 import middle.llvm_ir.function.IrFunction;
+import middle.llvm_ir.instruction.jump.io.*;
 import middle.llvm_ir.type.IrModuleType;
 import middle.llvm_ir.utils.IrGlobalVar;
 import middle.llvm_ir.utils.IrStrLiteral;
@@ -19,6 +20,16 @@ public class IrModule extends IrValue {
         this.strLiteralList = new ArrayList<>();
         this.globalVarList = new ArrayList<>();
         this.funcList = new ArrayList<>();
+
+        initDecl();
+    }
+
+    private void initDecl() {
+        addDeclare(IrGetintInstr.getDeclare());
+        addDeclare(IrGetcharInstr.getDeclare());
+        addDeclare(IrPutintInstr.getDeclare());
+        addDeclare(IrPutchInstr.getDeclare());
+        addDeclare(IrPutstrInstr.getDeclare());
     }
 
     public void addDeclare(String declare) {

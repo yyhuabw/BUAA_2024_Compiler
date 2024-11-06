@@ -3,6 +3,7 @@ package frontend.parser.ast.expression.single;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.expression.opExp.LOrExp;
+import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrValue;
 
 public class Cond implements SyntaxNode {
@@ -19,8 +20,17 @@ public class Cond implements SyntaxNode {
         return lOrExp.syntaxInfoOutput() + type.getName() + "\n";
     }
 
+    /**
+     * not use
+     * @return null
+     */
     @Override
     public IrValue genIR() {
-        return lOrExp.genIR();
+        return null;
+    }
+
+    // void
+    public void genIRForCond(IrBasicBlock ifTrueBlock, IrBasicBlock ifFalseBlock) {
+        lOrExp.genIRForLOrExp(ifTrueBlock, ifFalseBlock);
     }
 }

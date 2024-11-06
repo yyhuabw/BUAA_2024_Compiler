@@ -17,7 +17,7 @@ public class LOrExp extends OpExp<LAndExp> {
      * genIR() not use
      * operator must be ||
      */
-    public void genIRForLOrExp(IrBasicBlock ifTureBlock, IrBasicBlock ifFalseBlock) {
+    public void genIRForLOrExp(IrBasicBlock ifTrueBlock, IrBasicBlock ifFalseBlock) {
         ArrayList<LAndExp> lAndExps = new ArrayList<>();
         lAndExps.add(first);
         lAndExps.addAll(operands);
@@ -26,10 +26,10 @@ public class LOrExp extends OpExp<LAndExp> {
             LAndExp lAndExp = lAndExps.get(i);
 
             if (i == lAndExps.size() - 1) { // the last LAndExp
-                lAndExp.genIRForLAndExp(ifTureBlock, ifFalseBlock);
+                lAndExp.genIRForLAndExp(ifTrueBlock, ifFalseBlock);
             } else {
                 IrBasicBlock nextBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
-                lAndExp.genIRForLAndExp(ifTureBlock, nextBlock);
+                lAndExp.genIRForLAndExp(ifTrueBlock, nextBlock);
                 IrBuilder.getInstance().setCurBlock(nextBlock);
             }
         }

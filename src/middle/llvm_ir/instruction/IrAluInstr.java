@@ -9,9 +9,9 @@ public class IrAluInstr extends IrInstruction {
         sub,
         mul,
         sdiv,
-        srem,
-        and,
-        or
+        srem
+        // and
+        // or
     }
 
     private final Op op;

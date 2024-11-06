@@ -4,6 +4,8 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.constant.constInitVal.ConstInitValEle;
 import frontend.parser.ast.expression.opExp.AddExp;
 import middle.llvm_ir.IrValue;
+import middle.llvm_ir.type.IrType;
+import middle.llvm_ir.utils.constant.IrConstInt;
 
 public class ConstExp implements ConstInitValEle {
     private final SyntaxType type;
@@ -19,8 +21,20 @@ public class ConstExp implements ConstInitValEle {
         return addExp.syntaxInfoOutput() + type.getName() + "\n";
     }
 
+    public int evaluate() {
+        return addExp.evaluate();
+    }
+
+    /**
+     * not use
+     * @return null
+     */
     @Override
     public IrValue genIR() {
-        return addExp.genIR();
+        return null;
+    }
+
+    public IrConstInt genConstIR(IrType type) {
+        return new IrConstInt(type, evaluate());
     }
 }

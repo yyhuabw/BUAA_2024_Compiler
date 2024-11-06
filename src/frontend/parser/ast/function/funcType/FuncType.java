@@ -5,6 +5,7 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.type.CharType;
 import frontend.parser.ast.declaration.type.IntType;
 import frontend.parser.ast.declaration.type.VoidType;
+import middle.llvm_ir.IrValue;
 import middle.symbol.value.ValueType;
 
 public class FuncType implements SyntaxNode {
@@ -30,5 +31,14 @@ public class FuncType implements SyntaxNode {
     @Override
     public String syntaxInfoOutput() {
         return funcTypeEle.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    /**
+     * not use
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        return null;
     }
 }

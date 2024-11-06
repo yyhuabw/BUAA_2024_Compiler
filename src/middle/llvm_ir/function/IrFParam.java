@@ -1,5 +1,6 @@
 package middle.llvm_ir.function;
 
+import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrType;
 
@@ -11,6 +12,8 @@ public class IrFParam extends IrValue {
 
     public IrFParam(IrType type, String name) {
         super(type, name);
+
+        IrBuilder.getInstance().curFuncAddParam(this);
     }
 
     public void setParentFunc(IrFunction function) {

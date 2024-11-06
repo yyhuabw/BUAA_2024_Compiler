@@ -3,6 +3,8 @@ package frontend.parser.ast.statement.block;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.statement.stmt.StmtEle;
+import middle.llvm_ir.IrValue;
+import middle.symbol.SymbolManager;
 
 import java.util.ArrayList;
 
@@ -41,5 +43,22 @@ public class Block implements StmtEle {
         sb.append(rightBrace.syntaxInfoOutput());
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * void
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        SymbolManager.getInstance().enterScope();
+
+        for (BlockItem blockItem : blockItems) {
+            blockItem.genIR();
+        }
+
+        SymbolManager.getInstance().leaveScope();
+
+        return null;
     }
 }

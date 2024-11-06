@@ -6,8 +6,8 @@ import middle.llvm_ir.IrBasicBlock;
  * br label <dest>
  */
 public class IrDirtBrInstr extends IrBrInstr {
-    public IrDirtBrInstr(String name, IrBasicBlock destBlock) {
-        super(name);
+    public IrDirtBrInstr(IrBasicBlock destBlock) {
+        super();
         addOperand(destBlock);
     }
 

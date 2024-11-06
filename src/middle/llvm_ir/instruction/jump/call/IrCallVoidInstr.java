@@ -9,8 +9,8 @@ import java.util.ArrayList;
  * call void @funcName(...)
  */
 public class IrCallVoidInstr extends IrCallInstr {
-    public IrCallVoidInstr(String name, IrFunction function, ArrayList<IrValue> params) {
-        super(name, function, params);
+    public IrCallVoidInstr(IrFunction function, ArrayList<IrValue> params) {
+        super("call void", function, params);
     }
 
     @Override

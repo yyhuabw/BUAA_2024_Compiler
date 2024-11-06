@@ -1,6 +1,7 @@
 package middle.llvm_ir.function;
 
 import middle.llvm_ir.IrBasicBlock;
+import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrUser;
 import middle.llvm_ir.type.IrFuncType;
 import middle.llvm_ir.type.IrType;
@@ -18,6 +19,8 @@ public class IrFunction extends IrUser {
         this.returnType = returnType;
         this.params = new ArrayList<>();
         this.blocks = new ArrayList<>();
+
+        IrBuilder.getInstance().addFunc(this);
     }
 
     public void addParam(IrFParam param) {
@@ -50,6 +53,6 @@ public class IrFunction extends IrUser {
                 blocks.stream().map(IrBasicBlock::irOutput).
                         collect(Collectors.joining("\n")) +
 
-                "}\n";
+                "}\n\n";
     }
 }

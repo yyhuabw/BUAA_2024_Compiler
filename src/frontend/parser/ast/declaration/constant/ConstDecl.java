@@ -4,6 +4,7 @@ import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.type.BType;
 import frontend.parser.ast.declaration.decl.DeclEle;
+import middle.llvm_ir.IrValue;
 
 import java.util.ArrayList;
 
@@ -43,5 +44,17 @@ public class ConstDecl implements DeclEle {
         sb.append(semicolon.syntaxInfoOutput());
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        first.genIR();
+        for (ConstDef constDef : constDefs) {
+            constDef.genIR();
+        }
+        return null;
     }
 }

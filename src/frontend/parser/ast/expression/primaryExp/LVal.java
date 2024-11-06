@@ -9,8 +9,12 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.memory.IrGEPInstr;
 import middle.llvm_ir.instruction.memory.IrLoadInstr;
 import middle.llvm_ir.type.IrArrayType;
+import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrPointerType;
 import middle.llvm_ir.type.IrType;
+import middle.llvm_ir.utils.constant.IrConstArray;
+import middle.llvm_ir.utils.constant.IrConstInt;
+import middle.llvm_ir.utils.constant.IrConstant;
 import middle.symbol.ConstSymbol;
 import middle.symbol.Symbol;
 import middle.symbol.VarSymbol;
@@ -76,6 +80,27 @@ public class LVal implements PrimaryExpEle {
     }
 
     /**
+     * the LVal must be constant
+     * @return int
+     */
+    @Override
+    public int evaluate() {
+        Symbol symbol = ident.getSymbol();
+        if (symbol instanceof ConstSymbol constSymbol) {
+            int dimension = constSymbol.getDim();
+            IrConstant initValue = constSymbol.getInitValue();
+            if (dimension == 0) { // int
+                return ((IrConstInt) initValue).getValue();
+            } else { // array, must be a[i]
+                int index = exps.get(0).evaluate();
+                return ((IrConstArray) initValue).getIndexValue(index);
+            }
+        }
+        System.out.println("Error in LVal when evaluate");
+        return 0;
+    }
+
+    /**
      * one kind of PrimaryExp
      * for "... = ... LVal ..."
      */
@@ -86,24 +111,25 @@ public class LVal implements PrimaryExpEle {
         int dim = ident.queryDim();
         int bracketNum = leftBrackets.size();
 
-        if (symbol instanceof ConstSymbol) {
-            if (dim == 0) { // no need loadInstr, directly use the value
-                return value;
-            } else { // dim == 1
-                if (dim == bracketNum) { // x = a[1]
-                    IrGEPInstr gepInstr = genGEPInstr(value);
-                    return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), gepInstr);
-                }
+        if (symbol instanceof ConstSymbol constSymbol && dim == 0) { // contant
+            // no need loadInstr, directly use the value
+            IrValue initValue =  constSymbol.getInitValue();
+            if (initValue.getType().isINT32()) {
+                return initValue;
+            } else { // i8
+                IrConstInt initConstVal = (IrConstInt) initValue;
+                return new IrConstInt(IrIntType.INT32, initConstVal.getValue());
             }
-        } else if (symbol instanceof VarSymbol) {
-            if (dim == 0) { // load instr
-                return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), value);
-            } else { // dim == 1
-                if (dim == bracketNum) { // x = a[1]
-                    IrGEPInstr gepInstr = genGEPInstr(value);
-                    return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), gepInstr);
-                }
-            }
+        } else if (symbol instanceof VarSymbol && dim == 0) { // variable, x = a
+            // load instr
+            return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), value);
+        }
+
+        if (dim == 1 && bracketNum == 1) { // x = a[1]
+            IrGEPInstr gepInstr = genGEPInstr(value, true);
+            return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), gepInstr);
+        } else if (dim == 1 && bracketNum == 0) { // foo(int a[]), x = foo(a)
+            return genGEPInstr(value, false);
         }
 
         System.out.println("Invalid dimensions: " + dim + ", bracket count: " + bracketNum);
@@ -121,11 +147,11 @@ public class LVal implements PrimaryExpEle {
         if (dim == 0) {
             return value;
         } else { // dim == 1, the situation of "a[1] = 1"
-            return genGEPInstr(value);
+            return genGEPInstr(value, true);
         }
     }
 
-    private IrGEPInstr genGEPInstr(IrValue value) {
+    private IrGEPInstr genGEPInstr(IrValue value, boolean needIndex) {
         // the type of value must be the pointer of array
         IrPointerType pointerType = (IrPointerType) value.getType();
         IrArrayType arrayType = (IrArrayType) pointerType.getTargetType();
@@ -134,8 +160,13 @@ public class LVal implements PrimaryExpEle {
 
         String irName = IrBuilder.getInstance().getLocalVarName();
 
-        // dim == 1, only has one exp
-        IrValue irIndexValue = exps.get(0).genIR();
+        IrValue irIndexValue;
+        if (needIndex) {
+            // dim == 1, only has one exp, the type should be INT32
+            irIndexValue = exps.get(0).genIR();
+        } else {
+            irIndexValue = new IrConstInt(IrIntType.INT32, 0);
+        }
 
         return new IrGEPInstr(gepPtrType, irName, value, irIndexValue);
     }

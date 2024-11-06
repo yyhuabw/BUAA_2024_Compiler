@@ -3,6 +3,7 @@ package frontend.parser.ast.function.single;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.SyntaxNode;
 import frontend.parser.ast.SyntaxType;
+import middle.llvm_ir.IrValue;
 import middle.symbol.VarSymbol;
 
 import java.util.ArrayList;
@@ -26,9 +27,9 @@ public class FuncFParams implements SyntaxNode {
 
     public ArrayList<VarSymbol> getSymbols() {
         ArrayList<VarSymbol> symbols = new ArrayList<>();
-        symbols.add(first.getSymbol());
+        symbols.add(first.getVarSymbol());
         for (FuncFParam funcFParam : funcFParams) {
-            symbols.add(funcFParam.getSymbol());
+            symbols.add(funcFParam.getVarSymbol());
         }
         return symbols;
     }
@@ -43,5 +44,16 @@ public class FuncFParams implements SyntaxNode {
         }
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    // void
+    @Override
+    public IrValue genIR() {
+        first.genIR();
+        for (FuncFParam funcFParam : funcFParams) {
+            funcFParam.genIR();
+        }
+
+        return null;
     }
 }

@@ -1,9 +1,9 @@
 package middle.llvm_ir.type;
 
 public class IrIntType extends IrType {
-    public static IrIntType INT1 = new IrIntType(1);
-    public static IrIntType INT8 = new IrIntType(8);
-    public static IrIntType INT32 = new IrIntType(32);
+    public final static IrIntType INT1 = new IrIntType(1);
+    public final static IrIntType INT8 = new IrIntType(8);
+    public final static IrIntType INT32 = new IrIntType(32);
 
     private final int bitWidth;
 

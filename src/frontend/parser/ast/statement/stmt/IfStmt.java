@@ -2,7 +2,12 @@ package frontend.parser.ast.statement.stmt;
 
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Cond;
+import middle.llvm_ir.IrBasicBlock;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.jump.br.IrDirtBrInstr;
 
+// 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
 public class IfStmt implements StmtEle {
     private final Token ifTk;
     private final Token leftParent;
@@ -39,5 +44,49 @@ public class IfStmt implements StmtEle {
             sb.append(elseStmt.syntaxInfoOutput());
         }
         return sb.toString();
+    }
+
+    /**
+     * 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+     * void
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        IrBasicBlock ifTrueBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
+
+        if (elseTk != null) { // have ifFalseBlock
+            IrBasicBlock ifFalseBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
+            IrBasicBlock followBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
+
+            // analyse condExp
+            cond.genIRForCond(ifTrueBlock, ifFalseBlock);
+
+            // analyse ifStmt and br to followBlock
+            IrBuilder.getInstance().setCurBlock(ifTrueBlock);
+            ifStmt.genIR();
+            new IrDirtBrInstr(followBlock);
+
+            // analyse elseStmt and br to followBlock
+            IrBuilder.getInstance().setCurBlock(ifFalseBlock);
+            elseStmt.genIR();
+            new IrDirtBrInstr(followBlock);
+
+            IrBuilder.getInstance().setCurBlock(followBlock);
+        } else { // no ifFalseBlock
+            IrBasicBlock followBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
+
+            // analyse condExp
+            cond.genIRForCond(ifTrueBlock, followBlock);
+
+            // analyse ifStmt and br to followBlock
+            IrBuilder.getInstance().setCurBlock(ifTrueBlock);
+            ifStmt.genIR();
+            new IrDirtBrInstr(followBlock);
+
+            IrBuilder.getInstance().setCurBlock(followBlock);
+        }
+
+        return null;
     }
 }

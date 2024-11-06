@@ -3,11 +3,20 @@ package frontend.parser.ast.statement.stmt;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Exp;
 import frontend.parser.ast.terminal.StringConst;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.jump.io.IrPutchInstr;
+import middle.llvm_ir.instruction.jump.io.IrPutintInstr;
+import middle.llvm_ir.instruction.jump.io.IrPutstrInstr;
+import middle.llvm_ir.instruction.type_change.IrZextInstr;
+import middle.llvm_ir.type.IrIntType;
+import middle.llvm_ir.utils.IrStrLiteral;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// 'printf''('StringConst {','Exp}')'';'
 public class PrintfStmt implements StmtEle {
     private final Token printfTk;
     private final Token leftParent;
@@ -69,5 +78,46 @@ public class PrintfStmt implements StmtEle {
         sb.append(rightParent.syntaxInfoOutput());
         sb.append(semicolon.syntaxInfoOutput());
         return sb.toString();
+    }
+
+    /**
+     * void
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        String str = stringConst.getFixedContent();
+        StringBuilder sb = new StringBuilder(); // for strLiteral output
+        int expIndex = 0;
+
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '%' &&
+                    (str.charAt(i+1) == 'd' || str.charAt(i+1) == 'c')) {
+                if (!sb.isEmpty()) { // output and clear
+                    IrStrLiteral strLiteral = new IrStrLiteral(IrBuilder.getInstance().getStrLiteralName(), sb.toString());
+                    new IrPutstrInstr(strLiteral);
+                    sb.setLength(0);
+                }
+                if (str.charAt(i+1) == 'd') { // %d
+                    new IrPutintInstr(exps.get(expIndex++).genIR());
+                } else { // %c
+                    IrValue expIR = exps.get(expIndex++).genIR();
+                    IrZextInstr zextInstr = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    new IrPutchInstr(zextInstr);
+                }
+                i++; // skip %d | %c
+            } else if (str.charAt(i) == '\\') { // only have \n
+                sb.append('\n');
+                i++; // skip \n
+            } else {
+                sb.append(str.charAt(i));
+            }
+        }
+        if (!sb.isEmpty()) {
+            IrStrLiteral strLiteral = new IrStrLiteral(IrBuilder.getInstance().getStrLiteralName(), sb.toString());
+            new IrPutstrInstr(strLiteral);
+        }
+
+        return null;
     }
 }

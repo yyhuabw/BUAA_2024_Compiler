@@ -19,7 +19,7 @@ public class LAndExp extends OpExp<EqExp> {
      * genIR() not use
      * operator must be &&
      */
-    public void genIRForLAndExp(IrBasicBlock ifTureBlock, IrBasicBlock ifFalseBlock) {
+    public void genIRForLAndExp(IrBasicBlock ifTrueBlock, IrBasicBlock ifFalseBlock) {
         ArrayList<EqExp> eqExps = new ArrayList<>();
         eqExps.add(first);
         eqExps.addAll(operands);
@@ -28,10 +28,10 @@ public class LAndExp extends OpExp<EqExp> {
             EqExp eqExp = eqExps.get(i);
             IrValue cond = eqExp.genIR();
             if (i == eqExps.size() - 1) { // the last EqExp
-                new IrCondBrInstr(IrBuilder.getInstance().getLocalVarName(), cond, ifTureBlock, ifFalseBlock);
+                new IrCondBrInstr(cond, ifTrueBlock, ifFalseBlock);
             } else {
                 IrBasicBlock nextBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
-                new IrCondBrInstr(IrBuilder.getInstance().getLocalVarName(), cond, nextBlock, ifFalseBlock);
+                new IrCondBrInstr(cond, nextBlock, ifFalseBlock);
                 IrBuilder.getInstance().setCurBlock(nextBlock);
             }
         }

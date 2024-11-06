@@ -3,6 +3,8 @@ package frontend.parser.ast;
 import frontend.parser.ast.declaration.decl.Decl;
 import frontend.parser.ast.function.single.FuncDef;
 import frontend.parser.ast.function.single.MainFuncDef;
+import middle.llvm_ir.IrValue;
+import middle.symbol.SymbolManager;
 
 import java.util.ArrayList;
 
@@ -35,5 +37,25 @@ public class CompUnit implements SyntaxNode {
         sb.append(mainFuncDef.syntaxInfoOutput());
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    @Override
+    public IrValue genIR() {
+        SymbolManager.getInstance().setGlobalStatus(true);
+        SymbolManager.getInstance().enterScope();
+
+        for (Decl decl : decls) {
+            decl.genIR();
+        }
+
+        for (FuncDef funcDef : funcDefs) {
+            funcDef.genIR();
+        }
+
+        mainFuncDef.genIR();
+
+        SymbolManager.getInstance().leaveScope();
+
+        return null;
     }
 }

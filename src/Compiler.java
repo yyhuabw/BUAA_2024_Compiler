@@ -1,6 +1,9 @@
 import frontend.lexer.Lexer;
 import frontend.parser.Parser;
+import frontend.parser.ast.CompUnit;
 import middle.error.ErrorTable;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrModule;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,12 +21,14 @@ public class Compiler {
         ErrorTable errorTable = new ErrorTable();
         Lexer lexer = new Lexer(inputStream, errorTable);
         Parser parser = new Parser(lexer.getTokenStream(), errorTable);
-        parser.parseCompUnit();
+        CompUnit compUnit = parser.parseCompUnit();
+        compUnit.genIR();
+        IrModule irModule = IrBuilder.getInstance().getModule();
 
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
             try (OutputStream errStream = new FileOutputStream(errorFileName)) {
                 if (errorTable.isEmpty()) {
-                    outputStream.write();
+                    outputStream.write(irModule.irOutput().getBytes());
                 } else {
                     errStream.write(errorTable.toString().getBytes());
                 }

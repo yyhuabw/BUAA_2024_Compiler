@@ -5,8 +5,8 @@ import middle.llvm_ir.type.IrPointerType;
 import middle.llvm_ir.type.IrVoidType;
 
 public class IrPutstrInstr extends IrIOInstr {
-    public IrPutstrInstr(String name, IrStrLiteral strLiteral) {
-        super(IrVoidType.VOID, name);
+    public IrPutstrInstr(IrStrLiteral strLiteral) {
+        super(IrVoidType.VOID, "putstr");
         addOperand(strLiteral);
     }
 
@@ -14,8 +14,7 @@ public class IrPutstrInstr extends IrIOInstr {
         return (IrStrLiteral) getOperand(0);
     }
 
-    @Override
-    public String getDeclare() {
+    public static String getDeclare() {
         return "declare void @putstr(i8*)\n";
     }
 
@@ -26,7 +25,7 @@ public class IrPutstrInstr extends IrIOInstr {
 
         return "call void @putstr(i8* getelementptr inbounds (" +
                 strPtrType.getTargetType().irOutput() + ", " +
-                strPtrType + " " +
+                strPtrType.irOutput() + " " +
                 strLiteral.getName() + ", i64 0, i64 0))\n";
     }
 }

@@ -21,14 +21,18 @@ public class RelExp extends OpExp<AddExp> {
     @Override
     public IrValue genIR() {
         IrValue operand1 = first.genIR();
+        if (!operand1.getType().isINT32() && !operands.isEmpty()) { // will calculate
+            operand1 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand1);
+        }
+
         IrValue operand2;
         IrInstruction instruction;
 
         for (int i = 0; i < operands.size(); i++) {
-            if (!operand1.getType().isINT32()) { // change to i32
-                operand1 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand1);
-            }
             operand2 = operands.get(i).genIR(); // must be i32
+            if (!operand2.getType().isINT32()) {
+                operand2 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand2);
+            }
             switch (operators.get(i).getType()) {
                 case GRE: // >
                     instruction = new IrIcmpInstr(IrBuilder.getInstance().getLocalVarName(), IrIcmpInstr.Op.sgt, operand1, operand2);

@@ -32,6 +32,11 @@ public class ParentExp implements PrimaryExpEle {
     }
 
     @Override
+    public int evaluate() {
+        return exp.evaluate();
+    }
+
+    @Override
     public IrValue genIR() {
         return exp.genIR();
     }

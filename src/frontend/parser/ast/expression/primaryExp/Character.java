@@ -30,6 +30,11 @@ public class Character implements PrimaryExpEle {
     }
 
     @Override
+    public int evaluate() {
+        return charConst.evaluate();
+    }
+
+    @Override
     public IrValue genIR() {
         return charConst.genIR();
     }

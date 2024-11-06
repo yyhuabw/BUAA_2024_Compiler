@@ -5,6 +5,7 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.type.BType;
 import frontend.parser.ast.declaration.decl.DeclEle;
 import frontend.parser.ast.declaration.variable.varDef.VarDef;
+import middle.llvm_ir.IrValue;
 
 import java.util.ArrayList;
 
@@ -41,5 +42,17 @@ public class VarDecl implements DeclEle {
         sb.append(semicolon.syntaxInfoOutput());
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        first.genIR();
+        for (VarDef varDef : varDefs) {
+            varDef.genIR();
+        }
+        return null;
     }
 }

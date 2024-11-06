@@ -4,8 +4,8 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrVoidType;
 
 public class IrPutchInstr extends IrIOInstr {
-    public IrPutchInstr(String name, IrValue value) {
-        super(IrVoidType.VOID, name);
+    public IrPutchInstr(IrValue value) {
+        super(IrVoidType.VOID, "putch");
         addOperand(value);
     }
 
@@ -13,8 +13,7 @@ public class IrPutchInstr extends IrIOInstr {
         return getOperand(0);
     }
 
-    @Override
-    public String getDeclare() {
+    public static String getDeclare() {
         return "declare void @putch(i32)\n";
     }
 

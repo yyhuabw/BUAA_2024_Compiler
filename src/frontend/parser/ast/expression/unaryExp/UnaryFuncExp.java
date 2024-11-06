@@ -52,6 +52,15 @@ public class UnaryFuncExp implements UnaryExpEle {
         return sb.toString();
     }
 
+    /**
+     * not use
+     * @return 0
+     */
+    @Override
+    public int evaluate() {
+        return 0;
+    }
+
     @Override
     public IrValue genIR() {
         IrFunction irFunction = (IrFunction) ident.genIR();
@@ -64,11 +73,10 @@ public class UnaryFuncExp implements UnaryExpEle {
             }
         }
 
-        String name = IrBuilder.getInstance().getFuncName(irFunction.getName());
         if (irFunction.isVoid()) {
-            return new IrCallVoidInstr(name, irFunction, params);
+            return new IrCallVoidInstr(irFunction, params);
         } else {
-            return new IrCallValInstr(name, irFunction, params);
+            return new IrCallValInstr(IrBuilder.getInstance().getLocalVarName(), irFunction, params);
         }
     }
 }

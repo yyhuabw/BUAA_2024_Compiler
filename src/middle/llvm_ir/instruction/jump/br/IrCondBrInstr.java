@@ -7,11 +7,11 @@ import middle.llvm_ir.IrValue;
  * br i1 <cond>, label <iftrue>, label <iffalse>
  */
 public class IrCondBrInstr extends IrBrInstr {
-    public IrCondBrInstr(String name, IrValue cond,
-                         IrBasicBlock ifTureBlock, IrBasicBlock ifFalseBlock) {
-        super(name);
+    public IrCondBrInstr(IrValue cond,
+                         IrBasicBlock ifTrueBlock, IrBasicBlock ifFalseBlock) {
+        super();
         addOperand(cond);
-        addOperand(ifTureBlock);
+        addOperand(ifTrueBlock);
         addOperand(ifFalseBlock);
     }
 
@@ -19,7 +19,7 @@ public class IrCondBrInstr extends IrBrInstr {
         return getOperand(0);
     }
 
-    public IrBasicBlock getIfTureBlock() {
+    public IrBasicBlock getIfTrueBlock() {
         return (IrBasicBlock) getOperand(1);
     }
 
@@ -31,7 +31,7 @@ public class IrCondBrInstr extends IrBrInstr {
     public String irOutput() {
         return "br i1 " +
                 getCond().getName() +
-                ", label %" + getIfTureBlock().getName() +
+                ", label %" + getIfTrueBlock().getName() +
                 ", label %" + getIfFalseBlock().getName() + "\n";
     }
 }

@@ -4,8 +4,8 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrVoidType;
 
 public class IrPutintInstr extends IrIOInstr {
-    public IrPutintInstr(String name, IrValue value) {
-        super(IrVoidType.VOID, name);
+    public IrPutintInstr(IrValue value) {
+        super(IrVoidType.VOID, "putint");
         addOperand(value);
     }
 
@@ -13,8 +13,7 @@ public class IrPutintInstr extends IrIOInstr {
         return getOperand(0);
     }
 
-    @Override
-    public String getDeclare() {
+    public static String getDeclare() {
         return "declare void @putint(i32)\n";
     }
 

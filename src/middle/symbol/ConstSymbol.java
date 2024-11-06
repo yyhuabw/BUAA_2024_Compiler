@@ -1,17 +1,22 @@
 package middle.symbol;
 
 import middle.llvm_ir.IrValue;
+import middle.llvm_ir.utils.constant.IrConstant;
 import middle.symbol.value.ValueType;
 
 public class ConstSymbol extends Symbol {
     private final ValueType valueType;
     private final int dimension;
+    private final boolean isGlobal;
+    private IrConstant initValue;
     private IrValue irValue;
 
     public ConstSymbol(String name, ValueType valueType, int dimension) {
         super(name);
         this.valueType = valueType;
         this.dimension = dimension;
+        this.isGlobal = SymbolManager.getInstance().isGlobal();
+        this.initValue = null;
         this.irValue = null;
 
         setSymbolType();
@@ -33,6 +38,10 @@ public class ConstSymbol extends Symbol {
         }
     }
 
+    public void setInitValue(IrConstant initValue) {
+        this.initValue = initValue;
+    }
+
     public void setIrValue(IrValue value) {
         this.irValue = value;
     }
@@ -45,7 +54,15 @@ public class ConstSymbol extends Symbol {
         return dimension;
     }
 
+    public IrConstant getInitValue() {
+        return initValue;
+    }
+
     public IrValue getIrValue() {
         return irValue;
+    }
+
+    public boolean isGlobal() {
+        return isGlobal;
     }
 }

@@ -12,8 +12,8 @@ import middle.llvm_ir.type.IrVoidType;
 public class IrRetInstr extends IrInstruction {
     private final boolean retVoid;
 
-    public IrRetInstr(String name, IrValue retValue) {
-        super(IrVoidType.VOID, name, IrInstrType.RET);
+    public IrRetInstr(IrValue retValue) {
+        super(IrVoidType.VOID, "ret", IrInstrType.RET);
         if (retValue != null) {
             this.retVoid = false;
             addOperand(retValue);

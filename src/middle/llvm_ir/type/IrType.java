@@ -8,6 +8,14 @@ public class IrType {
         return this == IrIntType.INT32;
     }
 
+    public boolean isINT8() {
+        return this == IrIntType.INT8;
+    }
+
+    public boolean isINT1() {
+        return this == IrIntType.INT1;
+    }
+
     public boolean isVoid() {
         return this == IrVoidType.VOID;
     }

@@ -4,7 +4,9 @@ import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.ConstExp;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrArrayType;
+import middle.llvm_ir.type.IrType;
 import middle.llvm_ir.utils.constant.IrConstArray;
+import middle.llvm_ir.utils.constant.IrConstInt;
 
 import java.util.ArrayList;
 
@@ -55,6 +57,15 @@ public class ConstArrayInitVal implements ConstInitValEle {
         return null;
     }
 
-    public IrConstArray genIR(IrArrayType type) {
+    public IrConstArray genConstIR(IrArrayType type) {
+        IrType eleType = type.getEleType();
+        ArrayList<IrConstInt> values = new ArrayList<>();
+
+        values.add(new IrConstInt(eleType, first.evaluate()));
+        for (ConstExp constExp : constExps) {
+            values.add(new IrConstInt(eleType, constExp.evaluate()));
+        }
+
+        return new IrConstArray(type, values);
     }
 }

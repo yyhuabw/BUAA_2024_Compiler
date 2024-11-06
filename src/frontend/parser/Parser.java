@@ -123,6 +123,7 @@ public class Parser {
         ArrayList<FuncDef> funcDefs = new ArrayList<>();
         MainFuncDef mainFuncDef = null;
 
+        SymbolManager.getInstance().setGlobalStatus(true);
         SymbolManager.getInstance().enterScope(); // enter Scope
 
         while (true) {
@@ -665,6 +666,7 @@ public class Parser {
             handleBError(ident.getLineno());
         }
 
+        SymbolManager.getInstance().setGlobalStatus(false);
         // add func copy to SymbolTable's curFunc
         SymbolManager.getInstance().enterFuncDef(new FuncSymbol(ident.getToken().getContent(), funcType.getReturnType())); // enter funcDef Scope
 
@@ -703,7 +705,9 @@ public class Parser {
         Token rightParent = handleJError();
 
         // add func copy to SymbolTable's curFunc
-        SymbolManager.getInstance().enterFuncDef(new FuncSymbol("main", ValueType.INT)); // enter funcDef Scope
+        FuncSymbol mainFuncSymbol = new FuncSymbol("main", ValueType.INT);
+        SymbolManager.getInstance().setGlobalStatus(false);
+        SymbolManager.getInstance().enterFuncDef(mainFuncSymbol); // enter funcDef Scope
 
         Block block = parseBlock(false);
 
@@ -711,7 +715,9 @@ public class Parser {
 
         SymbolManager.getInstance().leaveFuncDef(); // leave funcDef Scope
 
-        return new MainFuncDef(intTk, mainTk, leftParent, rightParent, block);
+        MainFuncDef mainFuncDef = new MainFuncDef(intTk, mainTk, leftParent, rightParent, block);
+        mainFuncDef.setMainFuncSymbol(mainFuncSymbol);
+        return mainFuncDef;
     }
 
     public FuncFParams parseFuncFParams() {

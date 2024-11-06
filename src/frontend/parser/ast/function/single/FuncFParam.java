@@ -6,12 +6,21 @@ import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.declaration.type.BType;
 import frontend.parser.ast.expression.single.ConstExp;
 import frontend.parser.ast.terminal.Ident;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.function.IrFParam;
+import middle.llvm_ir.instruction.memory.IrAllocaInstr;
+import middle.llvm_ir.instruction.memory.IrStoreInstr;
+import middle.llvm_ir.type.IrIntType;
+import middle.llvm_ir.type.IrPointerType;
+import middle.llvm_ir.type.IrType;
 import middle.symbol.SymbolManager;
 import middle.symbol.VarSymbol;
 import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
 
+// FuncFParam → BType Ident ['[' ']']
 public class FuncFParam implements SyntaxNode {
     private final SyntaxType type;
     private final BType bType;
@@ -22,7 +31,7 @@ public class FuncFParam implements SyntaxNode {
     private ArrayList<Token> leftBrackets = null;
     private ArrayList<ConstExp> constExps = null;
     private ArrayList<Token> rightBrackets = null;
-    private VarSymbol symbol = null;
+    private VarSymbol varSymbol = null;
 
     public FuncFParam(BType bType, Ident ident) {
         this.type = SyntaxType.FUNC_FORMAL_PARAM;
@@ -63,12 +72,12 @@ public class FuncFParam implements SyntaxNode {
         }
 
         VarSymbol varSymbol = new VarSymbol(name, valueType, dimension);
-        this.symbol = varSymbol;
+        this.varSymbol = varSymbol;
         return SymbolManager.getInstance().addAndCheck(varSymbol);
     }
 
-    public VarSymbol getSymbol() {
-        return symbol;
+    public VarSymbol getVarSymbol() {
+        return varSymbol;
     }
 
     @Override
@@ -87,5 +96,33 @@ public class FuncFParam implements SyntaxNode {
         }
         sb.append(type.getName()).append("\n");
         return sb.toString();
+    }
+
+    /**
+     * FuncFParam → BType Ident ['[' ']']
+     * void
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        SymbolManager.getInstance().addAndCheck(varSymbol); // must success
+
+        IrType fParamType;
+        if (varSymbol.getDim() == 0) {
+            fParamType = bType.getValueType() == ValueType.INT ? IrIntType.INT32 : IrIntType.INT8;
+        } else { // array
+            fParamType = bType.getValueType() == ValueType.INT ? new IrPointerType(IrIntType.INT32) : new IrPointerType(IrIntType.INT8);
+        }
+        IrFParam fParam = new IrFParam(fParamType, IrBuilder.getInstance().getFuncParamName());
+
+        if (varSymbol.getDim() == 0) {
+            IrAllocaInstr allocaInstr = new IrAllocaInstr(IrBuilder.getInstance().getLocalVarName(), fParamType);
+            new IrStoreInstr(fParam, allocaInstr);
+            varSymbol.setIrValue(allocaInstr);
+        } else { // param's type is pointer
+            varSymbol.setIrValue(fParam);
+        }
+
+        return null;
     }
 }

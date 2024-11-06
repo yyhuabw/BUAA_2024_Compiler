@@ -2,6 +2,7 @@ package frontend.parser.ast.statement.stmt;
 
 import frontend.parser.ast.SyntaxType;
 import frontend.parser.ast.statement.block.BlockItemEle;
+import middle.llvm_ir.IrValue;
 
 public class Stmt implements BlockItemEle {
     private final SyntaxType type;
@@ -19,5 +20,10 @@ public class Stmt implements BlockItemEle {
     @Override
     public String syntaxInfoOutput() {
         return stmtEle.syntaxInfoOutput() + type.getName() + "\n";
+    }
+
+    @Override
+    public IrValue genIR() {
+        return stmtEle.genIR();
     }
 }

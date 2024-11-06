@@ -1,6 +1,9 @@
 package frontend.parser.ast.statement.stmt;
 
 import frontend.lexer.token.Token;
+import middle.llvm_ir.IrBuilder;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.jump.br.IrDirtBrInstr;
 
 public class BreakStmt implements StmtEle {
     private final Token breakTk;
@@ -14,5 +17,12 @@ public class BreakStmt implements StmtEle {
     @Override
     public String syntaxInfoOutput() {
         return breakTk.syntaxInfoOutput() + semicolon.syntaxInfoOutput();
+    }
+
+    // void
+    @Override
+    public IrValue genIR() {
+        new IrDirtBrInstr(IrBuilder.getInstance().getCurLoop().getFollowBlock());
+        return null;
     }
 }

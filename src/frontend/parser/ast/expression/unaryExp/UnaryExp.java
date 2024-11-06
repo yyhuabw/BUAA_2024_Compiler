@@ -27,6 +27,10 @@ public class UnaryExp implements SyntaxNode {
         return unaryExpEle.syntaxInfoOutput() + type.getName() + "\n";
     }
 
+    public int evaluate() {
+        return unaryExpEle.evaluate();
+    }
+
     @Override
     public IrValue genIR() {
         return unaryExpEle.genIR();

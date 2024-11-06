@@ -20,10 +20,26 @@ public class CharConst implements SyntaxNode {
 
     /**
      * the content string should only have one char
+     * ''
+     * 'c'
+     * '\c'
+     */
+    public int evaluate() {
+        if (token.getContent().charAt(1) == '\'') {
+            return 0;
+        }
+        int value = token.getContent().charAt(1);
+        if (value == '\\') {
+            value = token.getContent().charAt(2);
+        }
+        return value;
+    }
+
+    /**
+     * the content string should only have one char
      */
     @Override
     public IrValue genIR() {
-        int value = token.getContent().charAt(0);
-        return new IrConstInt(IrIntType.INT8, value);
+        return new IrConstInt(IrIntType.INT8, evaluate());
     }
 }

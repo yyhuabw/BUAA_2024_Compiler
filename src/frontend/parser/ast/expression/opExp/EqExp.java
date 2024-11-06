@@ -26,7 +26,7 @@ public class EqExp extends OpExp<RelExp> {
         IrInstruction instruction;
 
         if (operators.isEmpty()) { // only have RelExp
-            if (operand1.getType().isINT32()) { // ensure @return is i1
+            if (!operand1.getType().isINT1()) { // ensure @return is i1
                 operand1 = new IrIcmpInstr(IrBuilder.getInstance().getLocalVarName(), IrIcmpInstr.Op.ne,
                         operand1, new IrConstInt(IrIntType.INT32, 0));
             }

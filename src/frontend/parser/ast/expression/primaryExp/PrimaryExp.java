@@ -30,6 +30,11 @@ public class PrimaryExp implements UnaryExpEle {
     }
 
     @Override
+    public int evaluate() {
+        return primaryExpEle.evaluate();
+    }
+
+    @Override
     public IrValue genIR() {
         return primaryExpEle.genIR();
     }

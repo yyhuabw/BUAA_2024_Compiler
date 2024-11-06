@@ -34,6 +34,17 @@ public class UnaryOpExp implements UnaryExpEle {
     }
 
     @Override
+    public int evaluate() {
+        return switch (unaryOp.getOpType()) {
+            case PLUS -> unaryExp.evaluate();
+            case MINU -> -unaryExp.evaluate();
+            case NOT -> unaryExp.evaluate() == 0 ? 1 : 0; // not use
+
+            default -> 0; // Error
+        };
+    }
+
+    @Override
     public IrValue genIR() {
         IrValue expValue = unaryExp.genIR();
         IrValue assistant = new IrConstInt(IrIntType.INT32, 0);

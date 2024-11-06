@@ -6,6 +6,8 @@ import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.IrAluInstr;
 import middle.llvm_ir.instruction.IrInstruction;
+import middle.llvm_ir.instruction.type_change.IrZextInstr;
+import middle.llvm_ir.type.IrIntType;
 import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
@@ -58,15 +60,44 @@ public class AddExp extends OpExp<MulExp> {
         return 0;
     }
 
+    public int evaluate() {
+        int ans = first.evaluate();
+
+        for (int i = 0; i < operators.size(); i++) {
+            switch (operators.get(i).getType()) {
+                case PLUS:
+                    ans += operands.get(i).evaluate();
+                    break;
+                case MINU:
+                    ans -= operands.get(i).evaluate();
+                    break;
+
+                default:
+                    System.out.println("Illegal operator in AddExp");
+                    return 0;
+            }
+        }
+
+        return ans;
+    }
+
     // '+' | '−'
     @Override
     public IrValue genIR() {
         IrValue operand1 = first.genIR();
+        if (!operand1.getType().isINT32() && !operands.isEmpty()) { // will calculate
+            operand1 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand1);
+        }
+
         IrValue operand2;
         IrInstruction instruction;
 
         for (int i = 0; i < operands.size(); i++) {
             operand2 = operands.get(i).genIR();
+            if (!operand2.getType().isINT32()) {
+                operand2 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand2);
+            }
+
             switch (operators.get(i).getType()) {
                 case PLUS:
                     instruction = new IrAluInstr(IrBuilder.getInstance().getLocalVarName(), IrAluInstr.Op.add, operand1, operand2);

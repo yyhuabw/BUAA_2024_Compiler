@@ -7,11 +7,13 @@ public class SymbolManager {
     private final Stack<SymbolTable> symbolTableStack;
     private int loopDepth; // current loop layers
     private FuncSymbol curFunc; // current func copy, just for handling error, don't contain params
+    private boolean isGlobal;
 
     private SymbolManager() {
         this.symbolTableStack = new Stack<>();
         this.loopDepth = 0;
         this.curFunc = null;
+        this.isGlobal = false;
     }
 
     public static SymbolManager getInstance() {
@@ -69,5 +71,13 @@ public class SymbolManager {
 
     public void leaveLoop() {
         loopDepth--;
+    }
+
+    public void setGlobalStatus(boolean isGlobal) {
+        this.isGlobal = isGlobal;
+    }
+
+    public boolean isGlobal() {
+        return isGlobal;
     }
 }

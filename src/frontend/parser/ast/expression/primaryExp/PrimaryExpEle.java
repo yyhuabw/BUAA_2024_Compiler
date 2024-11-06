@@ -9,6 +9,8 @@ public interface PrimaryExpEle extends SyntaxNode {
 
     int getDim();
 
+    int evaluate();
+
     @Override
     IrValue genIR();
 }

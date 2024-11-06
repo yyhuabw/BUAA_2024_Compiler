@@ -7,8 +7,7 @@ public class IrGetintInstr extends IrIOInstr {
         super(IrIntType.INT32, name);
     }
 
-    @Override
-    public String getDeclare() {
+    public static String getDeclare() {
         return "declare i32 @getint()\n";
     }
 

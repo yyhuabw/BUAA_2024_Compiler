@@ -9,7 +9,7 @@ import middle.llvm_ir.type.IrVoidType;
  * br label <dest>
  */
 public class IrBrInstr extends IrInstruction {
-    public IrBrInstr(String name) {
-        super(IrVoidType.VOID, name, IrInstrType.BR);
+    public IrBrInstr() {
+        super(IrVoidType.VOID, "br", IrInstrType.BR);
     }
 }

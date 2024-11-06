@@ -2,6 +2,7 @@ package frontend.parser.ast.declaration.type;
 
 import frontend.lexer.token.Token;
 import frontend.parser.ast.function.funcType.FuncTypeEle;
+import middle.llvm_ir.IrValue;
 
 public class CharType implements BTypeEle, FuncTypeEle {
     private final Token charTk;
@@ -13,5 +14,14 @@ public class CharType implements BTypeEle, FuncTypeEle {
     @Override
     public String syntaxInfoOutput() {
         return charTk.syntaxInfoOutput();
+    }
+
+    /**
+     * not use
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        return null;
     }
 }

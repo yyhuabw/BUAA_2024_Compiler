@@ -8,7 +8,7 @@ import middle.symbol.value.ValueType;
 
 public class Ident implements SyntaxNode {
     private final Token token;
-    private Symbol symbol = null;
+    private Symbol symbol = null; // only use in LVal
 
     public Ident(Token token) {
         this.token = token;

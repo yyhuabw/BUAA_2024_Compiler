@@ -16,6 +16,8 @@ public class IrBasicBlock extends IrUser {
     public IrBasicBlock(String name) {
         super(IrLabelType.LABEL, name);
         this.instrList = new ArrayList<>();
+
+        IrBuilder.getInstance().curFuncAddBlock(this);
     }
 
     public void addInstr(IrInstruction instr) {
@@ -31,7 +33,7 @@ public class IrBasicBlock extends IrUser {
         StringBuilder sb = new StringBuilder();
         sb.append(getName()).append(":\n");
         for (IrInstruction instr : instrList) {
-            sb.append(instr.irOutput());
+            sb.append("    ").append(instr.irOutput());
         }
         return sb.toString();
     }

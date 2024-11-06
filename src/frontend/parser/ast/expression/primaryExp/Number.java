@@ -30,6 +30,11 @@ public class Number implements PrimaryExpEle {
     }
 
     @Override
+    public int evaluate() {
+        return intConst.evaluate();
+    }
+
+    @Override
     public IrValue genIR() {
         return intConst.genIR();
     }

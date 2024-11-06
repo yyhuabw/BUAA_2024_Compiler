@@ -8,8 +8,4 @@ public class IrIOInstr extends IrInstruction {
     public IrIOInstr(IrType type, String name) {
         super(type, name, IrInstrType.IO);
     }
-
-    public String getDeclare() {
-        return "";
-    }
 }

@@ -18,6 +18,10 @@ public class IntConst implements SyntaxNode {
         return token.syntaxInfoOutput();
     }
 
+    public int evaluate() {
+        return Integer.parseInt(token.getContent());
+    }
+
     @Override
     public IrValue genIR() {
         int value = Integer.parseInt(token.getContent());

@@ -9,8 +9,8 @@ import middle.llvm_ir.type.IrVoidType;
  * store value to pointer
  */
 public class IrStoreInstr extends IrInstruction {
-    public IrStoreInstr(String name, IrValue value, IrValue pointer) {
-        super(IrVoidType.VOID, name, IrInstrType.STORE);
+    public IrStoreInstr(IrValue value, IrValue pointer) {
+        super(IrVoidType.VOID, "store", IrInstrType.STORE);
         addOperand(value);
         addOperand(pointer);
     }

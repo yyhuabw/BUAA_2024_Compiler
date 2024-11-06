@@ -2,7 +2,10 @@ package frontend.parser.ast.statement.stmt;
 
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Exp;
+import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.jump.IrRetInstr;
 
+// 'return' [Exp] ';'
 public class ReturnStmt implements StmtEle {
     private final Token returnTk;
     private Exp exp = null;
@@ -27,5 +30,19 @@ public class ReturnStmt implements StmtEle {
         }
         sb.append(semicolon.syntaxInfoOutput());
         return sb.toString();
+    }
+
+    /**
+     * void
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        if (exp == null) { // void
+            new IrRetInstr(null);
+        } else {
+            new IrRetInstr(exp.genIR());
+        }
+        return null;
     }
 }

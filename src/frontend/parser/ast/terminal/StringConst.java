@@ -22,6 +22,10 @@ public class StringConst implements ConstInitValEle, InitValEle {
         return token.getContent();
     }
 
+    public String getFixedContent() {
+        return token.getContent().substring(1, token.getContent().length() - 1);
+    }
+
     @Override
     public String syntaxInfoOutput() {
         return token.syntaxInfoOutput();
@@ -36,21 +40,21 @@ public class StringConst implements ConstInitValEle, InitValEle {
         return null;
     }
 
-    public IrConstArray genIR(IrArrayType type) {
+    @Override
+    public IrValue genVarIR(IrType type) {
+        return genConstIR((IrArrayType) type);
+    }
+
+    /**
+     * except printf's stringConst
+     */
+    public IrConstArray genConstIR(IrArrayType type) {
         ArrayList<IrConstInt> values = new ArrayList<>();
+        IrType eleType = type.getEleType(); // should be INT8
 
-        IrType eleType = type.getEleType();
-        int eleNum = type.getEleNum();
-        String content = token.getContent();
-
-        for (int i = 0; i < eleNum; i++) {
-            int value;
-            if (i < content.length()) {
-                value = content.charAt(i);
-            } else {
-                value = 0;
-            }
-            values.add(new IrConstInt(eleType, value));
+        String fixedContent = token.getContent().substring(1, token.getContent().length() - 1);
+        for (int i = 0; i < fixedContent.length(); i++) {
+            values.add(new IrConstInt(eleType, fixedContent.charAt(i)));
         }
 
         return new IrConstArray(type, values);

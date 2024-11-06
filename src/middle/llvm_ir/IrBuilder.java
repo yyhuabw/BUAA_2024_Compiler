@@ -3,10 +3,12 @@ package middle.llvm_ir;
 import middle.llvm_ir.function.IrFParam;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.IrInstruction;
+import middle.llvm_ir.utils.IrForLoop;
 import middle.llvm_ir.utils.IrGlobalVar;
 import middle.llvm_ir.utils.IrStrLiteral;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 public class IrBuilder {
     private static final IrBuilder IR_BUILDER = new IrBuilder();
@@ -34,6 +36,7 @@ public class IrBuilder {
     private final IrModule module;
     private IrBasicBlock curBlock;
     private IrFunction curFunction;
+    private final Stack<IrForLoop> loopStack;
 
     private IrBuilder() {
         this.strLiteralCnt = 0;
@@ -44,6 +47,7 @@ public class IrBuilder {
         this.module = new IrModule();
         this.curBlock = null;
         this.curFunction = null;
+        this.loopStack = new Stack<>();
     }
 
     public static IrBuilder getInstance() {
@@ -52,10 +56,6 @@ public class IrBuilder {
 
     public IrModule getModule() {
         return module;
-    }
-
-    public void addDeclare(String declare) {
-        module.addDeclare(declare);
     }
 
     public void addStrLiteral(IrStrLiteral strLiteral) {
@@ -94,6 +94,22 @@ public class IrBuilder {
     public void curBlockAddInstr(IrInstruction instr) {
         curBlock.addInstr(instr);
         instr.setParentBlock(curBlock);
+    }
+
+    public IrFunction getCurFunction() {
+        return curFunction;
+    }
+
+    public void pushLoop(IrForLoop loop) {
+        loopStack.push(loop);
+    }
+
+    public void popLoop() {
+        loopStack.pop();
+    }
+
+    public IrForLoop getCurLoop() {
+        return loopStack.peek();
     }
 
     /**

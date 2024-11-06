@@ -10,6 +10,10 @@ public class IrConstInt extends IrConstant {
         this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public String irOutput() {
         return getType().irOutput() + " " + value;

@@ -1,6 +1,7 @@
 package frontend.parser.ast.declaration.type;
 
 import frontend.parser.ast.SyntaxNode;
+import middle.llvm_ir.IrValue;
 import middle.symbol.value.ValueType;
 
 public class BType implements SyntaxNode {
@@ -22,5 +23,14 @@ public class BType implements SyntaxNode {
     @Override
     public String syntaxInfoOutput() {
         return bTypeEle.syntaxInfoOutput();
+    }
+
+    /**
+     * not use
+     * @return null
+     */
+    @Override
+    public IrValue genIR() {
+        return null;
     }
 }
