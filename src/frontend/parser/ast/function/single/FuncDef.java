@@ -49,7 +49,7 @@ public class FuncDef implements SyntaxNode {
 
     public void setFuncFParams(FuncFParams funcFParams) {
         this.funcFParams = funcFParams;
-        funcSymbol.setSymbols(funcFParams.getSymbols());
+        funcSymbol.setParamSymbols(funcFParams.getSymbols());
     }
 
     public boolean addToSTAndCheck() {
@@ -89,13 +89,11 @@ public class FuncDef implements SyntaxNode {
         // create irFunction
         String name = IrBuilder.getInstance().getFuncName(ident.getToken().getContent());
         IrType irReturnType;
-        if (funcType.getReturnType() == ValueType.INT) {
-            irReturnType = IrIntType.INT32;
-        } else if (funcType.getReturnType() == ValueType.CHAR) {
-            irReturnType = IrIntType.INT8;
-        } else { // VOID
-            irReturnType = IrVoidType.VOID;
-        }
+        irReturnType = switch (funcType.getReturnType()) {
+            case INT -> IrIntType.INT32;
+            case CHAR -> IrIntType.INT8;
+            case VOID -> IrVoidType.VOID;
+        };
         IrFunction function = new IrFunction(name, irReturnType);
         funcSymbol.setIrFunction(function);
 

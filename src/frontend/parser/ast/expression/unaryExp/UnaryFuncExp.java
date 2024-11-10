@@ -9,6 +9,11 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.jump.call.IrCallValInstr;
 import middle.llvm_ir.instruction.jump.call.IrCallVoidInstr;
+import middle.llvm_ir.instruction.type_change.IrTruncInstr;
+import middle.llvm_ir.instruction.type_change.IrZextInstr;
+import middle.llvm_ir.type.IrIntType;
+import middle.symbol.FuncSymbol;
+import middle.symbol.VarSymbol;
 import middle.symbol.value.ValueType;
 
 import java.util.ArrayList;
@@ -64,12 +69,23 @@ public class UnaryFuncExp implements UnaryExpEle {
     @Override
     public IrValue genIR() {
         IrFunction irFunction = (IrFunction) ident.genIR();
-        ArrayList<IrValue> params = new ArrayList<>();
 
+        ArrayList<IrValue> params = new ArrayList<>();
         if (funcRParams != null) {
             ArrayList<Exp> exps = funcRParams.getAllExps();
-            for (Exp exp : exps) {
-                params.add(exp.genIR());
+            ArrayList<VarSymbol> paramSymbols = ((FuncSymbol) ident.getSymbol()).getParamSymbols();
+            for (int i = 0; i < exps.size(); i++) {
+                IrValue expIR = exps.get(i).genIR();
+                VarSymbol paramSymbol = paramSymbols.get(i);
+
+                // type change
+                if (paramSymbol.getValueType() == ValueType.CHAR && expIR.getType().isINT32()) {
+                    expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
+                } else if (paramSymbol.getValueType() == ValueType.INT && expIR.getType().isINT8()) {
+                    expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                }
+
+                params.add(expIR);
             }
         }
 

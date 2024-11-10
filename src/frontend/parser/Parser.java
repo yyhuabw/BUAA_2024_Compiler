@@ -1091,24 +1091,24 @@ public class Parser {
         }
         if (funcRParams != null && funcSymbol.getParamsSize() == funcRParams.getParamsSize()) {
             ArrayList<Exp> exps = funcRParams.getAllExps();
-            ArrayList<VarSymbol> varSymbols = funcSymbol.getSymbols();
+            ArrayList<VarSymbol> paramSymbols = funcSymbol.getParamSymbols();
             for (int i = 0; i < funcSymbol.getParamsSize(); i++) {
                 Exp exp = exps.get(i);
                 int expDim = exp.getDim();
-                VarSymbol varSymbol = varSymbols.get(i);
+                VarSymbol paramSymbol = paramSymbols.get(i);
 
                 if (expDim < 0) { // undefined ident
                     return;
                 }
 
-                if (expDim != varSymbol.getDim()) { // array <-> int
+                if (expDim != paramSymbol.getDim()) { // array <-> int
                     addError(ErrorType.PARAM_TYPE_MISMATCH, ident.getLineno());
                     return;
                 }
 
-                // exp.getDim() == varSymbol.getDim()
+                // exp.getDim() == paramSymbol.getDim()
                 if (expDim > 0
-                        && !exp.getValueType().equals(varSymbol.getValueType())) { // int array <-> char array
+                        && !exp.getValueType().equals(paramSymbol.getValueType())) { // int array <-> char array
                     addError(ErrorType.PARAM_TYPE_MISMATCH, ident.getLineno());
                     return;
                 }

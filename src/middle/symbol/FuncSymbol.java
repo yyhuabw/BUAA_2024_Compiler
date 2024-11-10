@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class FuncSymbol extends Symbol {
     private final ValueType returnType;
-    private ArrayList<VarSymbol> symbols = new ArrayList<>(); // Func Formal Params
+    private ArrayList<VarSymbol> paramSymbols = new ArrayList<>(); // Func Formal Params
     private IrFunction irFunction;
 
     public FuncSymbol(String name, ValueType returnType) {
@@ -27,8 +27,8 @@ public class FuncSymbol extends Symbol {
         }
     }
 
-    public void setSymbols(ArrayList<VarSymbol> symbols) {
-        this.symbols = symbols;
+    public void setParamSymbols(ArrayList<VarSymbol> paramSymbols) {
+        this.paramSymbols = paramSymbols;
     }
 
     public void setIrFunction(IrFunction function) {
@@ -40,11 +40,11 @@ public class FuncSymbol extends Symbol {
     }
 
     public int getParamsSize() {
-        return symbols.size();
+        return paramSymbols.size();
     }
 
-    public ArrayList<VarSymbol> getSymbols() {
-        return symbols;
+    public ArrayList<VarSymbol> getParamSymbols() {
+        return paramSymbols;
     }
 
     public IrFunction getIrFunction() {

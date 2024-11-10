@@ -59,10 +59,11 @@ public class InitArrayVal implements InitValEle {
     @Override
     public IrValue genVarIR(IrType type) {
         ArrayList<IrValue> values = new ArrayList<>();
+        IrType eleType = ((IrArrayType) type).getEleType();
 
-        values.add(first.genIR());
+        values.add(first.genVarIR(eleType));
         for (Exp exp : exps) {
-            values.add(exp.genIR());
+            values.add(exp.genVarIR(eleType));
         }
 
         return new IrValArray(type, values);

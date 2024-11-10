@@ -99,11 +99,17 @@ public class PrintfStmt implements StmtEle {
                     sb.setLength(0);
                 }
                 if (str.charAt(i+1) == 'd') { // %d
-                    new IrPutintInstr(exps.get(expIndex++).genIR());
+                    IrValue expIR = exps.get(expIndex++).genIR();
+                    if (!expIR.getType().isINT32()) {
+                        expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    }
+                    new IrPutintInstr(expIR);
                 } else { // %c
                     IrValue expIR = exps.get(expIndex++).genIR();
-                    IrZextInstr zextInstr = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
-                    new IrPutchInstr(zextInstr);
+                    if (!expIR.getType().isINT32()) {
+                        expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    }
+                    new IrPutchInstr(expIR);
                 }
                 i++; // skip %d | %c
             } else if (str.charAt(i) == '\\') { // only have \n

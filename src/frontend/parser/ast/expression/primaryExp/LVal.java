@@ -8,6 +8,7 @@ import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.memory.IrGEPInstr;
 import middle.llvm_ir.instruction.memory.IrLoadInstr;
+import middle.llvm_ir.instruction.type_change.IrZextInstr;
 import middle.llvm_ir.type.IrArrayType;
 import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrPointerType;
@@ -103,6 +104,7 @@ public class LVal implements PrimaryExpEle {
     /**
      * one kind of PrimaryExp
      * for "... = ... LVal ..."
+     * or "call foo(type LVal, ...)"
      */
     @Override
     public IrValue genIR() {
@@ -113,23 +115,21 @@ public class LVal implements PrimaryExpEle {
 
         if (symbol instanceof ConstSymbol constSymbol && dim == 0) { // contant
             // no need loadInstr, directly use the value
-            IrValue initValue =  constSymbol.getInitValue();
-            if (initValue.getType().isINT32()) {
-                return initValue;
-            } else { // i8
-                IrConstInt initConstVal = (IrConstInt) initValue;
-                return new IrConstInt(IrIntType.INT32, initConstVal.getValue());
-            }
+            return constSymbol.getInitValue();
         } else if (symbol instanceof VarSymbol && dim == 0) { // variable, x = a
             // load instr
             return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), value);
         }
 
-        if (dim == 1 && bracketNum == 1) { // x = a[1]
-            IrGEPInstr gepInstr = genGEPInstr(value, true);
+        if (dim == 1 && bracketNum == 1) { // x = a[1], a may be "local variable" or "func fParam"
+            IrGEPInstr gepInstr = genGEPInstrOfIndex(value);
             return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), gepInstr);
         } else if (dim == 1 && bracketNum == 0) { // foo(int a[]), x = foo(a)
-            return genGEPInstr(value, false);
+            if (((IrPointerType) value.getType()).getTargetType().isArray()) {
+                return genGEPInstrOfArray(value);
+            } else {
+                return value;
+            }
         }
 
         System.out.println("Invalid dimensions: " + dim + ", bracket count: " + bracketNum);
@@ -147,27 +147,41 @@ public class LVal implements PrimaryExpEle {
         if (dim == 0) {
             return value;
         } else { // dim == 1, the situation of "a[1] = 1"
-            return genGEPInstr(value, true);
+            return genGEPInstrOfIndex(value);
         }
     }
 
-    private IrGEPInstr genGEPInstr(IrValue value, boolean needIndex) {
-        // the type of value must be the pointer of array
-        IrPointerType pointerType = (IrPointerType) value.getType();
-        IrArrayType arrayType = (IrArrayType) pointerType.getTargetType();
-        IrType eleType = arrayType.getEleType();
-        IrPointerType gepPtrType = new IrPointerType(eleType);
+    private IrGEPInstr genGEPInstrOfArray(IrValue value) {
+        IrValue arrayIndex = new IrConstInt(IrIntType.INT32, 0);
+        return new IrGEPInstr(getGEPType((IrPointerType) value.getType()), IrBuilder.getInstance().getLocalVarName(), value, arrayIndex);
+    }
 
-        String irName = IrBuilder.getInstance().getLocalVarName();
-
-        IrValue irIndexValue;
-        if (needIndex) {
-            // dim == 1, only has one exp, the type should be INT32
-            irIndexValue = exps.get(0).genIR();
-        } else {
-            irIndexValue = new IrConstInt(IrIntType.INT32, 0);
+    private IrGEPInstr genGEPInstrOfIndex(IrValue value) {
+        IrValue irIndexValue = exps.get(0).genIR();
+        if (!irIndexValue.getType().isINT32()) {
+            if (irIndexValue instanceof IrConstInt constInt) {
+                irIndexValue = new IrConstInt(IrIntType.INT32, constInt.getValue());
+            } else {
+                irIndexValue = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), irIndexValue);
+            }
         }
+        return new IrGEPInstr(getGEPType((IrPointerType) value.getType()), IrBuilder.getInstance().getLocalVarName(), value, irIndexValue);
+    }
 
-        return new IrGEPInstr(gepPtrType, irName, value, irIndexValue);
+    /**
+     * to get the type of GEPInstr
+     * @return IrPointerType
+     */
+    private IrPointerType getGEPType(IrPointerType pointerType) {
+        // the pointerType may be "the pointer of array" or "the pointer of int"
+        IrType targetType = pointerType.getTargetType();
+        if (targetType instanceof IrArrayType arrayType) { // the pointer of array
+            return new IrPointerType(arrayType.getEleType());
+        } else if (targetType instanceof IrIntType) { // the pointer of int
+            return new IrPointerType(targetType);
+        } else {
+            System.out.println("Error type in LVal when get GEPInstr's Type");
+            return null;
+        }
     }
 }

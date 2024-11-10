@@ -25,14 +25,27 @@ public class CharConst implements SyntaxNode {
      * '\c'
      */
     public int evaluate() {
-        if (token.getContent().charAt(1) == '\'') {
+        String fixedContent = token.getContent().substring(1, token.getContent().length() - 1);
+        if (fixedContent.isEmpty()) { // null
             return 0;
         }
-        int value = token.getContent().charAt(1);
-        if (value == '\\') {
-            value = token.getContent().charAt(2);
+        if (fixedContent.charAt(0) == '\\') {
+            return switch (fixedContent.charAt(1)) {
+                case 'a' -> 7;
+                case 'b' -> 8;
+                case 't' -> 9;
+                case 'n' -> 10;
+                case 'v' -> 11;
+                case 'f' -> 12;
+                case '\"' -> 34;
+                case '\'' -> 39;
+                case '\\' -> 92;
+                case '\0' -> -1;
+
+                default -> 0;
+            };
         }
-        return value;
+        return fixedContent.charAt(0);
     }
 
     /**

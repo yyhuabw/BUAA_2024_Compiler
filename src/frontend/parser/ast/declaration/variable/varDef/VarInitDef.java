@@ -86,7 +86,7 @@ public class VarInitDef implements VarDefEle {
 
         SymbolManager.getInstance().addAndCheck(varSymbol); // must success
 
-        if (varSymbol.isGlobal()) { // global variable
+        if (varSymbol.isGlobal()) { // only global variable can use "varSymbol.getInitValue()"
             varSymbol.setInitValue(initVal.genConstIR(initValType));
 
             IrConstant initValue = varSymbol.getInitValue();
@@ -98,7 +98,7 @@ public class VarInitDef implements VarDefEle {
             varSymbol.setIrValue(allocaInstr);
             IrValue varValue = initVal.genVarIR(initValType);
 
-            if (varSymbol.getDim() == 0) {
+            if (varSymbol.getDim() == 0) { // "char" or "int"
                 new IrStoreInstr(varValue, allocaInstr);
             } else { // array
                 if (varValue instanceof IrValArray irValArray) { // InitArrayVal

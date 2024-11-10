@@ -61,7 +61,9 @@ public class ConstArrayInitVal implements ConstInitValEle {
         IrType eleType = type.getEleType();
         ArrayList<IrConstInt> values = new ArrayList<>();
 
-        values.add(new IrConstInt(eleType, first.evaluate()));
+        if (first != null) {
+            values.add(new IrConstInt(eleType, first.evaluate()));
+        }
         for (ConstExp constExp : constExps) {
             values.add(new IrConstInt(eleType, constExp.evaluate()));
         }

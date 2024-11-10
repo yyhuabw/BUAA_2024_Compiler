@@ -25,6 +25,6 @@ public class IrValue implements IrNode {
 
     @Override
     public String irOutput() {
-        return name + "\n";
+        return "name: " + name + " type: " + type.irOutput() + "\n";
     }
 }

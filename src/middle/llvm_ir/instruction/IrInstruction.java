@@ -21,8 +21,4 @@ public class IrInstruction extends IrUser {
     public void setParentBlock(IrBasicBlock block) {
         this.parentBlock = block;
     }
-
-    public IrInstrType getInstrType() {
-        return instrType;
-    }
 }

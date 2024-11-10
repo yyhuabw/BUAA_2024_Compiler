@@ -115,6 +115,8 @@ public class ForLoopStmt implements StmtEle {
         IrBuilder.getInstance().setCurBlock(condBlock);
         cond.genIRForCond(loopBodyBlock, followBlock);
 
+        new IrDirtBrInstr(loopBodyBlock);
+
         IrBuilder.getInstance().setCurBlock(loopBodyBlock);
         stmt.genIR();
 
@@ -137,6 +139,8 @@ public class ForLoopStmt implements StmtEle {
         IrBasicBlock followBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
 
         IrBuilder.getInstance().pushLoop(new IrForLoop(stepBlock, followBlock));
+
+        new IrDirtBrInstr(loopBodyBlock);
 
         IrBuilder.getInstance().setCurBlock(loopBodyBlock);
         stmt.genIR();
@@ -166,6 +170,8 @@ public class ForLoopStmt implements StmtEle {
         IrBuilder.getInstance().setCurBlock(condBlock);
         cond.genIRForCond(loopBodyBlock, followBlock);
 
+        new IrDirtBrInstr(loopBodyBlock);
+
         IrBuilder.getInstance().setCurBlock(loopBodyBlock);
         stmt.genIR();
 
@@ -182,6 +188,8 @@ public class ForLoopStmt implements StmtEle {
         IrBasicBlock followBlock = new IrBasicBlock(IrBuilder.getInstance().getBlockLabelName());
 
         IrBuilder.getInstance().pushLoop(new IrForLoop(loopBodyBlock, followBlock));
+
+        new IrDirtBrInstr(loopBodyBlock);
 
         IrBuilder.getInstance().setCurBlock(loopBodyBlock);
         stmt.genIR();
