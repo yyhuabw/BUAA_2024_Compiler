@@ -116,15 +116,15 @@ public class LVal implements PrimaryExpEle {
         if (symbol instanceof ConstSymbol constSymbol && dim == 0) { // contant
             // no need loadInstr, directly use the value
             return constSymbol.getInitValue();
-        } else if (symbol instanceof VarSymbol && dim == 0) { // variable, x = a
+        } else if (symbol instanceof VarSymbol && dim == 0) { // variable, "... = a"
             // load instr
             return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), value);
         }
 
-        if (dim == 1 && bracketNum == 1) { // x = a[1], a may be "local variable" or "func fParam"
+        if (dim == 1 && bracketNum == 1) { // "... = a[1]", a may be "local variable" or "func fParam"
             IrGEPInstr gepInstr = genGEPInstrOfIndex(value);
             return new IrLoadInstr(IrBuilder.getInstance().getLocalVarName(), gepInstr);
-        } else if (dim == 1 && bracketNum == 0) { // foo(int a[]), x = foo(a)
+        } else if (dim == 1 && bracketNum == 0) { // "foo(int* a)", "... = foo(a[])"
             if (((IrPointerType) value.getType()).getTargetType().isArray()) {
                 return genGEPInstrOfArray(value);
             } else {
@@ -146,7 +146,7 @@ public class LVal implements PrimaryExpEle {
 
         if (dim == 0) {
             return value;
-        } else { // dim == 1, the situation of "a[1] = 1"
+        } else { // dim == 1, the situation of "a[1] = ..."
             return genGEPInstrOfIndex(value);
         }
     }
