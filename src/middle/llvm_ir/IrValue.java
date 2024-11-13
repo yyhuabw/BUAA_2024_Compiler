@@ -27,4 +27,8 @@ public class IrValue implements IrNode {
     public String irOutput() {
         return "name: " + name + " type: " + type.irOutput() + "\n";
     }
+
+    @Override
+    public void genMIPS() {
+    }
 }

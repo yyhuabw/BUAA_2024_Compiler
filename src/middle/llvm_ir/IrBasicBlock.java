@@ -4,10 +4,10 @@ import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.IrInstruction;
 import middle.llvm_ir.type.IrLabelType;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class IrBasicBlock extends IrUser {
-    private final ArrayList<IrInstruction> instrList;
+    private final LinkedList<IrInstruction> instrList;
     private IrFunction parentFunc = null;
 
     /**
@@ -15,7 +15,7 @@ public class IrBasicBlock extends IrUser {
      */
     public IrBasicBlock(String name) {
         super(IrLabelType.LABEL, name);
-        this.instrList = new ArrayList<>();
+        this.instrList = new LinkedList<>();
 
         IrBuilder.getInstance().curFuncAddBlock(this);
     }

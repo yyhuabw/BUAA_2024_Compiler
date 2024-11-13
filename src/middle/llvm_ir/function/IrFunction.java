@@ -7,18 +7,19 @@ import middle.llvm_ir.type.IrFuncType;
 import middle.llvm_ir.type.IrType;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class IrFunction extends IrUser {
     private final IrType returnType;
     private final ArrayList<IrFParam> params;
-    private final ArrayList<IrBasicBlock> blocks;
+    private final LinkedList<IrBasicBlock> blocks;
 
     public IrFunction(String name, IrType returnType) {
         super(IrFuncType.FUNC, name);
         this.returnType = returnType;
         this.params = new ArrayList<>();
-        this.blocks = new ArrayList<>();
+        this.blocks = new LinkedList<>();
 
         IrBuilder.getInstance().addFunc(this);
     }
