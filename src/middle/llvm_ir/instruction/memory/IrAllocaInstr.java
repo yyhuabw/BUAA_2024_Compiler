@@ -13,6 +13,10 @@ public class IrAllocaInstr extends IrInstruction {
         this.targetType = targetType;
     }
 
+    public IrType getTargetType() {
+        return targetType;
+    }
+
     @Override
     public String irOutput() {
         return getName() + " = alloca " + targetType.irOutput() + "\n";

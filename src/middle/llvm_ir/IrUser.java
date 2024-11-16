@@ -15,10 +15,22 @@ public class IrUser extends IrValue {
 
     public void addOperand(IrValue value) {
         operands.add(value);
+        value.addUse(this);
     }
 
     public void addOperands(ArrayList<IrValue> values) {
         operands.addAll(values);
+        for (IrValue value : values) {
+            value.addUse(this);
+        }
+    }
+
+    // ensure contain oldValue
+    public void modifyOperand(IrValue oldValue, IrValue newValue) {
+        int index = operands.indexOf(oldValue);
+        oldValue.removeUse(this);
+        operands.set(index, newValue);
+        newValue.addUse(this);
     }
 
     public IrValue getOperand(int index) {

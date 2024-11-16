@@ -4,6 +4,7 @@ import frontend.parser.ast.CompUnit;
 import middle.error.ErrorTable;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrModule;
+import middle.optimize.Optimizer;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,11 +20,18 @@ public class Compiler {
         PushbackInputStream inputStream =
                 new PushbackInputStream(new FileInputStream(inputFileName));
         ErrorTable errorTable = new ErrorTable();
+
         Lexer lexer = new Lexer(inputStream, errorTable);
+
         Parser parser = new Parser(lexer.getTokenStream(), errorTable);
         CompUnit compUnit = parser.parseCompUnit();
+
+        IrBuilder.getInstance().setAutoInsertMode();
         compUnit.genIR();
         IrModule irModule = IrBuilder.getInstance().getModule();
+
+        IrBuilder.getInstance().setDefaultMode();
+        Optimizer.getInstance().run(irModule);
 
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
             try (OutputStream errStream = new FileOutputStream(errorFileName)) {

@@ -14,6 +14,14 @@ public class IrBuilder {
     private static final IrBuilder IR_BUILDER = new IrBuilder();
 
     /**
+     * AUTO_INSERT_MODE -> IrValue will be inserted automatically when "new"
+     * DEFAULT_MODE     -> IrValue won't be inserted automatically
+     */
+    private static final int AUTO_INSERT_MODE = 1;
+    private static final int DEFAULT_MODE = 0;
+    private int mode = DEFAULT_MODE;
+
+    /**
      * string literal    -> @.str.cnt
      * global variable   -> @name
      * function          -> @name
@@ -52,6 +60,18 @@ public class IrBuilder {
 
     public static IrBuilder getInstance() {
         return IR_BUILDER;
+    }
+
+    public void setAutoInsertMode() {
+        this.mode = AUTO_INSERT_MODE;
+    }
+
+    public void setDefaultMode() {
+        this.mode = DEFAULT_MODE;
+    }
+
+    public boolean isAutoInsertMode() {
+        return mode == AUTO_INSERT_MODE;
     }
 
     public IrModule getModule() {
@@ -153,6 +173,12 @@ public class IrBuilder {
     public String getLocalVarName() {
         int curIndex = varCntMap.get(curFunction);
         varCntMap.put(curFunction, curIndex + 1);
+        return LOCAL_VAR_PREFIX + curIndex;
+    }
+
+    public String getLocalVarName(IrFunction function) { // for phiInstr
+        int curIndex = varCntMap.get(function);
+        varCntMap.put(function, curIndex + 1);
         return LOCAL_VAR_PREFIX + curIndex;
     }
 

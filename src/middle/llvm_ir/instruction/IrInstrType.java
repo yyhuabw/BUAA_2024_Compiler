@@ -12,5 +12,6 @@ public enum IrInstrType {
     RET,
     GEP, // get element ptr
     ZEXT,
-    TRUNC
+    TRUNC,
+    PHI
 }

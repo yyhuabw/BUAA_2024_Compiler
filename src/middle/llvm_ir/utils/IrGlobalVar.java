@@ -11,7 +11,9 @@ public class IrGlobalVar extends IrUser {
         super(type, name);
         this.initVal = initVal;
 
-        IrBuilder.getInstance().addGlobalVar(this);
+        if (IrBuilder.getInstance().isAutoInsertMode()) {
+            IrBuilder.getInstance().addGlobalVar(this);
+        }
     }
 
     @Override

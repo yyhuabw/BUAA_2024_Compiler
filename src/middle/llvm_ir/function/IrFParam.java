@@ -13,7 +13,9 @@ public class IrFParam extends IrValue {
     public IrFParam(IrType type, String name) {
         super(type, name);
 
-        IrBuilder.getInstance().curFuncAddParam(this);
+        if (IrBuilder.getInstance().isAutoInsertMode()) {
+            IrBuilder.getInstance().curFuncAddParam(this);
+        }
     }
 
     public void setParentFunc(IrFunction function) {

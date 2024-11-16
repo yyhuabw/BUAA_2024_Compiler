@@ -48,6 +48,10 @@ public class IrModule extends IrValue {
         funcList.add(function);
     }
 
+    public ArrayList<IrFunction> getFuncList() {
+        return funcList;
+    }
+
     @Override
     public String irOutput() {
         StringBuilder sb = new StringBuilder();

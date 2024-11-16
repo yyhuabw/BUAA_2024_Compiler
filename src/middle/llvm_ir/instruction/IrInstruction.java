@@ -15,10 +15,16 @@ public class IrInstruction extends IrUser {
         this.instrType = instrType;
 
         // add the instruction to the block when create it
-        IrBuilder.getInstance().curBlockAddInstr(this);
+        if (IrBuilder.getInstance().isAutoInsertMode()) {
+            IrBuilder.getInstance().curBlockAddInstr(this);
+        }
     }
 
     public void setParentBlock(IrBasicBlock block) {
         this.parentBlock = block;
+    }
+
+    public IrBasicBlock getParentBlock() {
+        return parentBlock;
     }
 }

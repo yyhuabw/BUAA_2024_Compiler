@@ -18,7 +18,9 @@ public class IrStrLiteral extends IrValue {
         this.content = content;
 
         // add strLiteral
-        IrBuilder.getInstance().addStrLiteral(this);
+        if (IrBuilder.getInstance().isAutoInsertMode()) {
+            IrBuilder.getInstance().addStrLiteral(this);
+        }
     }
 
     private String getFixedContent() {

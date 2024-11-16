@@ -7,20 +7,31 @@ import middle.llvm_ir.type.IrFuncType;
 import middle.llvm_ir.type.IrType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class IrFunction extends IrUser {
     private final IrType returnType;
     private final ArrayList<IrFParam> params;
-    private final ArrayList<IrBasicBlock> blocks;
+    private final LinkedList<IrBasicBlock> blocks;
+
+    // control flow graph
+    private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> prevMap = null;
+    private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> nextMap = null;
+    // dominate graph|tree
+    private HashMap<IrBasicBlock, IrBasicBlock> idomorMap; // dominated -> immediate dominator
+    private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap; // block -> immediate dominateds
 
     public IrFunction(String name, IrType returnType) {
         super(IrFuncType.FUNC, name);
         this.returnType = returnType;
         this.params = new ArrayList<>();
-        this.blocks = new ArrayList<>();
+        this.blocks = new LinkedList<>();
 
-        IrBuilder.getInstance().addFunc(this);
+        if (IrBuilder.getInstance().isAutoInsertMode()) {
+            IrBuilder.getInstance().addFunc(this);
+        }
     }
 
     public void addParam(IrFParam param) {
@@ -37,6 +48,26 @@ public class IrFunction extends IrUser {
 
     public boolean isVoid() {
         return returnType.isVoid();
+    }
+
+    public LinkedList<IrBasicBlock> getBlocks() {
+        return blocks;
+    }
+
+    public void setPrevMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> prevMap) {
+        this.prevMap = prevMap;
+    }
+
+    public void setNextMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> nextMap) {
+        this.nextMap = nextMap;
+    }
+
+    public void setIdomorMap(HashMap<IrBasicBlock, IrBasicBlock> idomorMap) {
+        this.idomorMap = idomorMap;
+    }
+
+    public void setIdomedMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap) {
+        this.idomedMap = idomedMap;
     }
 
     @Override
