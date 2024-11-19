@@ -7,7 +7,7 @@ import middle.llvm_ir.instruction.IrPhiInstr;
 import middle.llvm_ir.instruction.memory.IrAllocaInstr;
 import middle.llvm_ir.instruction.memory.IrLoadInstr;
 import middle.llvm_ir.instruction.memory.IrStoreInstr;
-import middle.llvm_ir.utils.IrUninitValue;
+import middle.llvm_ir.utils.constant.IrConstInt;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -149,7 +149,8 @@ public class Mem2Reg {
             }
             // load value -> peek()
             else if (instruction instanceof IrLoadInstr loadInstr && useCurInstrList.contains(loadInstr)) {
-                loadInstr.allUserChangeToNewValue(stack.isEmpty() ? new IrUninitValue() : stack.peek());
+                // stack.isEmpty -> unInit
+                loadInstr.allUserChangeToNewValue(stack.isEmpty() ? new IrConstInt(loadInstr.getType(), 0) : stack.peek());
                 iterator.remove();
             }
         }
@@ -159,7 +160,8 @@ public class Mem2Reg {
             IrInstruction firstInstr = nextBlock.getFirstInstr();
             // judge is this phi or not
             if (firstInstr instanceof IrPhiInstr phiInstr && useCurInstrList.contains(phiInstr)) {
-                phiInstr.addOption(entrance, stack.isEmpty() ? new IrUninitValue() : stack.peek());
+                // stack.isEmpty -> unInit
+                phiInstr.addOption(entrance, stack.isEmpty() ? new IrConstInt(phiInstr.getType(), 0) : stack.peek());
             }
         }
 

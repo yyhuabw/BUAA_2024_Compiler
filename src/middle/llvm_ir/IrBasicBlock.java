@@ -1,10 +1,14 @@
 package middle.llvm_ir;
 
+import middle.llvm_ir.function.IrFParam;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.IrInstruction;
+import middle.llvm_ir.instruction.IrPhiInstr;
 import middle.llvm_ir.type.IrLabelType;
+import middle.llvm_ir.utils.IrGlobalVar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class IrBasicBlock extends IrUser {
@@ -24,6 +28,12 @@ public class IrBasicBlock extends IrUser {
     private ArrayList<IrBasicBlock> idomeds;
     // dominance frontier
     private ArrayList<IrBasicBlock> DF;
+
+    // active variable analysis
+    private HashSet<IrValue> def;
+    private HashSet<IrValue> use;
+    private HashSet<IrValue> in;
+    private HashSet<IrValue> out;
 
     /**
      * @param name: the label of basicBlock
@@ -111,6 +121,64 @@ public class IrBasicBlock extends IrUser {
 
     public ArrayList<IrBasicBlock> getDF() {
         return DF;
+    }
+
+    // for active variable analysis
+    public void genDefUse() {
+        def = new HashSet<>();
+        use = new HashSet<>();
+
+        // phiInstr requires special handling because it is parallel
+        for (IrInstruction instruction : instrList) {
+            if (instruction instanceof IrPhiInstr phiInstr) {
+                for (IrValue operand : phiInstr.getOperands()) {
+                    if (operand instanceof IrInstruction || operand instanceof IrFParam || operand instanceof IrGlobalVar) {
+                        use.add(operand);
+                    }
+                }
+            }
+        }
+
+        for (IrInstruction instruction : instrList) {
+            // use
+            for (IrValue operand : instruction.getOperands()) {
+                if (!def.contains(operand) && (operand instanceof IrInstruction || operand instanceof IrFParam || operand instanceof IrGlobalVar)) {
+                    use.add(operand);
+                }
+            }
+
+            /*
+             * def
+             * the instr should be the value that can be used
+             */
+            if (!use.contains(instruction) && instruction.canBeUsed()) {
+                def.add(instruction);
+            }
+        }
+    }
+
+    public void setIn(HashSet<IrValue> in) {
+        this.in = in;
+    }
+
+    public void setOut(HashSet<IrValue> out) {
+        this.out = out;
+    }
+
+    public HashSet<IrValue> getDef() {
+        return def;
+    }
+
+    public HashSet<IrValue> getUse() {
+        return use;
+    }
+
+    public HashSet<IrValue> getIn() {
+        return in;
+    }
+
+    public HashSet<IrValue> getOut() {
+        return out;
     }
 
     @Override

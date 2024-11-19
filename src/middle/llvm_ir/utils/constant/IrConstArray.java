@@ -34,6 +34,18 @@ public class IrConstArray extends IrConstant {
         return values;
     }
 
+    public boolean needZeroInit() {
+        return needZeroInit;
+    }
+
+    public ArrayList<Integer> getAllValue() {
+        ArrayList<Integer> allValue = new ArrayList<>();
+        for (IrConstInt value : values) {
+            allValue.add(value.getValue());
+        }
+        return allValue;
+    }
+
     public int getIndexValue(int index) {
         return values.get(index).getValue();
     }

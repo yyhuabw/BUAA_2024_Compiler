@@ -14,6 +14,11 @@ public class IrCallValInstr extends IrCallInstr {
     }
 
     @Override
+    public boolean canBeUsed() {
+        return true;
+    }
+
+    @Override
     public String irOutput() {
         return getName() + " = call " +
                 getType().irOutput() + " " +

@@ -21,6 +21,11 @@ public class IrPhiInstr extends IrInstruction {
     }
 
     @Override
+    public boolean canBeUsed() {
+        return true;
+    }
+
+    @Override
     public String irOutput() {
         StringBuilder sb = new StringBuilder();
 

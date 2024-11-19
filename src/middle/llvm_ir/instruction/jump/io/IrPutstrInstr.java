@@ -1,5 +1,9 @@
 package middle.llvm_ir.instruction.jump.io;
 
+import backend.mips.Register;
+import backend.mips.assembly.instruction.MipsSyscallInstr;
+import backend.mips.assembly.instruction.extended.MipsLaInstr;
+import backend.mips.assembly.instruction.extended.MipsLiInstr;
 import middle.llvm_ir.utils.IrStrLiteral;
 import middle.llvm_ir.type.IrPointerType;
 import middle.llvm_ir.type.IrVoidType;
@@ -27,5 +31,14 @@ public class IrPutstrInstr extends IrIOInstr {
                 strPtrType.getTargetType().irOutput() + ", " +
                 strPtrType.irOutput() + " " +
                 strLiteral.getName() + ", i64 0, i64 0))\n";
+    }
+
+    @Override
+    public void genAsm() {
+        super.genAsm();
+
+        new MipsLaInstr(Register.A0, getStrLiteral().getName().substring(1));
+        new MipsLiInstr(Register.V0, 4);
+        new MipsSyscallInstr();
     }
 }

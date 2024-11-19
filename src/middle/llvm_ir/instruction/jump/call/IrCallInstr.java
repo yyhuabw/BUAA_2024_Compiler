@@ -38,4 +38,12 @@ public class IrCallInstr extends IrInstruction {
         }
         return paramsInfo;
     }
+
+    @Override
+    public void genAsm() {
+        super.genAsm();
+
+        IrFunction function = getFunction();
+        ArrayList<IrValue> params = getParams();
+    }
 }

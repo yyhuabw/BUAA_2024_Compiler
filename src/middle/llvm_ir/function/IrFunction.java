@@ -1,8 +1,10 @@
 package middle.llvm_ir.function;
 
+import backend.mips.Register;
 import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrUser;
+import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrFuncType;
 import middle.llvm_ir.type.IrType;
 
@@ -20,8 +22,11 @@ public class IrFunction extends IrUser {
     private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> prevMap = null;
     private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> nextMap = null;
     // dominate graph|tree
-    private HashMap<IrBasicBlock, IrBasicBlock> idomorMap; // dominated -> immediate dominator
-    private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap; // block -> immediate dominateds
+    private HashMap<IrBasicBlock, IrBasicBlock> idomorMap = null; // dominated -> immediate dominator
+    private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap = null; // block -> immediate dominateds
+
+    // register-Allocate
+    private HashMap<IrValue, Register> var2reg = null;
 
     public IrFunction(String name, IrType returnType) {
         super(IrFuncType.FUNC, name);
@@ -68,6 +73,14 @@ public class IrFunction extends IrUser {
 
     public void setIdomedMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap) {
         this.idomedMap = idomedMap;
+    }
+
+    public void setVar2reg(HashMap<IrValue, Register> var2reg) {
+        this.var2reg = var2reg;
+    }
+
+    public HashMap<IrValue, Register> getVar2reg() {
+        return var2reg;
     }
 
     @Override

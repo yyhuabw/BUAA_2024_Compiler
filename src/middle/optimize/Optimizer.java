@@ -15,5 +15,8 @@ public class Optimizer {
         new Mem2Reg(module).run();
 
         new CheckTypeChangeInstr(module).run();
+
+        new ActiveVarAnalyzer(module).run();
+        new RegAllocator(module).run();
     }
 }

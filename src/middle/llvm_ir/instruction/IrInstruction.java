@@ -1,5 +1,6 @@
 package middle.llvm_ir.instruction;
 
+import backend.mips.assembly.instruction.MipsComment;
 import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrUser;
@@ -24,7 +25,16 @@ public class IrInstruction extends IrUser {
         this.parentBlock = block;
     }
 
+    public boolean canBeUsed() {
+        return false;
+    }
+
     public IrBasicBlock getParentBlock() {
         return parentBlock;
+    }
+
+    @Override
+    public void genAsm() {
+        new MipsComment(this.irOutput().substring(0, this.irOutput().length() - 1));
     }
 }
