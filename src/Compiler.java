@@ -37,8 +37,8 @@ public class Compiler {
             outputStream.write(irModule.irOutput().getBytes());
         }
 
-//        IrBuilder.getInstance().setDefaultMode();
-//        Optimizer.getInstance().run(irModule);
+        IrBuilder.getInstance().setDefaultMode();
+        Optimizer.getInstance().run(irModule);
 
         irModule.genAsm();
         MipsModule mipsModule = MipsBuilder.getInstance().getModule();
