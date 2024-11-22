@@ -1,5 +1,6 @@
 package middle.llvm_ir;
 
+import backend.mips.assembly.instruction.MipsLabel;
 import middle.llvm_ir.function.IrFParam;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.IrInstruction;
@@ -189,5 +190,13 @@ public class IrBasicBlock extends IrUser {
             sb.append("    ").append(instr.irOutput());
         }
         return sb.toString();
+    }
+
+    @Override
+    public void genAsm() {
+        new MipsLabel(getName());
+        for (IrInstruction instruction : instrList) {
+            instruction.genAsm();
+        }
     }
 }

@@ -41,6 +41,10 @@ public enum Register implements MipsNode {
         this.name = name;
     }
 
+    public static Register getRegWithIndex(Register base, int index) {
+        return values()[base.ordinal() + index];
+    }
+
     @Override
     public String mipsOutput() {
         return name;

@@ -37,7 +37,7 @@ public class IrBuilder {
     private static final String FUNC_PARAM_PREFIX = "%p.";
 
     private int strLiteralCnt;
-    private final HashMap<IrFunction, Integer> blockCntMap;
+    private int blockCnt;
     private final HashMap<IrFunction, Integer> varCntMap;
     private final HashMap<IrFunction, Integer> paramCntMap;
 
@@ -48,7 +48,7 @@ public class IrBuilder {
 
     private IrBuilder() {
         this.strLiteralCnt = 0;
-        this.blockCntMap = new HashMap<>();
+        this.blockCnt = 0;
         this.varCntMap = new HashMap<>();
         this.paramCntMap = new HashMap<>();
 
@@ -91,7 +91,6 @@ public class IrBuilder {
     }
 
     public void setCurFunction(IrFunction function) {
-        blockCntMap.put(function, 0);
         varCntMap.put(function, 0);
         paramCntMap.put(function, 0);
         curFunction = function;
@@ -161,9 +160,7 @@ public class IrBuilder {
      * @return String
      */
     public String getBlockLabelName() {
-        int curIndex = blockCntMap.get(curFunction);
-        blockCntMap.put(curFunction, curIndex + 1);
-        return BLOCK_LABEL_PREFIX + curIndex;
+        return BLOCK_LABEL_PREFIX + blockCnt++;
     }
 
     /**

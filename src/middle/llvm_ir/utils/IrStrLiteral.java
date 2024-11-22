@@ -1,5 +1,6 @@
 package middle.llvm_ir.utils;
 
+import backend.mips.assembly.globalDecl.MipsAsciizAsm;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.type.IrArrayType;
@@ -32,5 +33,10 @@ public class IrStrLiteral extends IrValue {
         return getName() + " = private unnamed_addr constant " +
                 ((IrPointerType) getType()).getTargetType().irOutput() + " c\"" +
                 getFixedContent() + "\\00\", align 1\n";
+    }
+
+    @Override
+    public void genAsm() {
+        new MipsAsciizAsm(getName().substring(2), content.replace("\n", "\\n"));
     }
 }

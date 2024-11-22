@@ -1,3 +1,5 @@
+import backend.mips.MipsBuilder;
+import backend.mips.MipsModule;
 import frontend.lexer.Lexer;
 import frontend.parser.Parser;
 import frontend.parser.ast.CompUnit;
@@ -14,7 +16,8 @@ import java.io.PushbackInputStream;
 public class Compiler {
     public static void main(String[] args) throws Exception {
         String inputFileName = "testfile.txt";
-        String outputFileName = "llvm_ir.txt";
+        String tempOutputFileName = "llvm_ir.txt";
+        String outputFileName = "mips.txt";
         String errorFileName = "error.txt";
 
         PushbackInputStream inputStream =
@@ -30,13 +33,20 @@ public class Compiler {
         compUnit.genIR();
         IrModule irModule = IrBuilder.getInstance().getModule();
 
-        IrBuilder.getInstance().setDefaultMode();
-        Optimizer.getInstance().run(irModule);
+        try (OutputStream outputStream = new FileOutputStream(tempOutputFileName)) {
+            outputStream.write(irModule.irOutput().getBytes());
+        }
+
+//        IrBuilder.getInstance().setDefaultMode();
+//        Optimizer.getInstance().run(irModule);
+
+        irModule.genAsm();
+        MipsModule mipsModule = MipsBuilder.getInstance().getModule();
 
         try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
             try (OutputStream errStream = new FileOutputStream(errorFileName)) {
                 if (errorTable.isEmpty()) {
-                    outputStream.write(irModule.irOutput().getBytes());
+                    outputStream.write(mipsModule.mipsOutput().getBytes());
                 } else {
                     errStream.write(errorTable.toString().getBytes());
                 }

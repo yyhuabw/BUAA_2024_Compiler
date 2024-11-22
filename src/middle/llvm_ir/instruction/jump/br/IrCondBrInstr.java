@@ -54,7 +54,7 @@ public class IrCondBrInstr extends IrBrInstr {
         }
 
         // cond == 1 <-> true
-        new MipsBranchInstr(MipsBranchInstr.Op.bne, Register.ZERO, getIfTrueBlock().getName());
+        new MipsBranchInstr(MipsBranchInstr.Op.bne, reg, Register.ZERO, getIfTrueBlock().getName());
         // cond == 0 <-> false
         new MipsJumpInstr(MipsJumpInstr.Op.j, getIfFalseBlock().getName());
     }

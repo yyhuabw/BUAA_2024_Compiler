@@ -35,12 +35,12 @@ public class EqExp extends OpExp<RelExp> {
 
         for (int i = 0; i < operands.size(); i++) {
             if (!operand1.getType().isINT32()) { // change to i32
-                operand1 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand1);
+                operand1 = changeToI32(operand1);
             }
 
             operand2 = operands.get(i).genIR();
             if (!operand2.getType().isINT32()) { // change to i32
-                operand2 = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), operand2);
+                operand2 = changeToI32(operand2);
             }
 
             switch (operators.get(i).getType()) {
@@ -59,5 +59,13 @@ public class EqExp extends OpExp<RelExp> {
         }
 
         return operand1;
+    }
+
+    private IrValue changeToI32(IrValue value) {
+        if (value instanceof IrConstInt constInt) {
+            return new IrConstInt(IrIntType.INT32, constInt.getValue());
+        } else {
+            return new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), value);
+        }
     }
 }

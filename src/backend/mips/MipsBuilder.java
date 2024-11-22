@@ -3,9 +3,12 @@ package backend.mips;
 import backend.mips.assembly.globalDecl.MipsGlobalDecl;
 import backend.mips.assembly.instruction.MipsInstr;
 import middle.llvm_ir.IrValue;
+import middle.llvm_ir.function.IrFParam;
 import middle.llvm_ir.function.IrFunction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * $sp is always at the bottom of the stack
@@ -44,6 +47,10 @@ public class MipsBuilder {
         this.var2reg = function.getVar2reg();
     }
 
+    public IrFunction getCurFunc() {
+        return curFunc;
+    }
+
     public void addDeclToData(MipsGlobalDecl globalDecl) {
         module.addDeclToData(globalDecl);
     }
@@ -69,6 +76,18 @@ public class MipsBuilder {
         return stackMap.get(value);
     }
 
+    // for we have reg-allocator
+    public boolean useReg() {
+        return var2reg != null;
+    }
+
+    public void allocaRegToParam(IrFParam param, Register register) {
+        if (var2reg == null) {
+            return;
+        }
+        var2reg.put(param, register);
+    }
+
     public Register getRegFor(IrValue value) {
         // close reg-allocator
         if (var2reg == null) {
@@ -76,6 +95,13 @@ public class MipsBuilder {
         }
 
         return var2reg.get(value);
+    }
+
+    public ArrayList<Register> getAllocatedRegs() {
+        if (var2reg == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(new HashSet<>(var2reg.values()));
     }
 
     public MipsModule getModule() {

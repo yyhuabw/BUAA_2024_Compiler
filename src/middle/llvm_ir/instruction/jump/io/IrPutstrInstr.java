@@ -37,7 +37,7 @@ public class IrPutstrInstr extends IrIOInstr {
     public void genAsm() {
         super.genAsm();
 
-        new MipsLaInstr(Register.A0, getStrLiteral().getName().substring(1));
+        new MipsLaInstr(Register.A0, getStrLiteral().getName().substring(2));
         new MipsLiInstr(Register.V0, 4);
         new MipsSyscallInstr();
     }

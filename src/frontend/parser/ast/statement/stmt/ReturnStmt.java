@@ -5,11 +5,7 @@ import frontend.parser.ast.expression.single.Exp;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.jump.IrRetInstr;
-import middle.llvm_ir.instruction.type_change.IrTruncInstr;
-import middle.llvm_ir.instruction.type_change.IrZextInstr;
-import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrType;
-import middle.llvm_ir.utils.constant.IrConstInt;
 
 // 'return' [Exp] ';'
 public class ReturnStmt implements StmtEle {
@@ -46,25 +42,8 @@ public class ReturnStmt implements StmtEle {
         }
 
         IrType returnType = IrBuilder.getInstance().getCurFunction().getReturnType();
-        IrValue expIR = exp.genIR();
 
-        if (returnType.isINT8() && expIR.getType().isINT32()) {
-            // expIR change to INT8
-            if (expIR instanceof IrConstInt constInt) {
-                expIR = new IrConstInt(IrIntType.INT8, constInt.getValue());
-            } else {
-                expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
-            }
-        } else if (returnType.isINT32() && expIR.getType().isINT8()) {
-            // expIR change to INT32
-            if (expIR instanceof IrConstInt constInt) {
-                expIR = new IrConstInt(IrIntType.INT32, constInt.getValue());
-            } else {
-                expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
-            }
-        }
-
-        new IrRetInstr(expIR);
+        new IrRetInstr(exp.genVarIR(returnType));
         return null;
     }
 }

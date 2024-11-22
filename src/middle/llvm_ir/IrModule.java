@@ -1,5 +1,7 @@
 package middle.llvm_ir;
 
+import backend.mips.assembly.instruction.MipsComment;
+import backend.mips.assembly.instruction.jump.MipsJumpInstr;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.jump.io.*;
 import middle.llvm_ir.type.IrModuleType;
@@ -76,5 +78,23 @@ public class IrModule extends IrValue {
         }
 
         return sb.toString();
+    }
+
+    @Override
+    public void genAsm() {
+        for (IrGlobalVar globalVar : globalVarList) {
+            globalVar.genAsm();
+        }
+
+        for (IrStrLiteral strLiteral : strLiteralList) {
+            strLiteral.genAsm();
+        }
+
+        new MipsComment("turn to main function");
+        new MipsJumpInstr(MipsJumpInstr.Op.jal, "main");
+
+        for (IrFunction function : funcList) {
+            function.genAsm();
+        }
     }
 }

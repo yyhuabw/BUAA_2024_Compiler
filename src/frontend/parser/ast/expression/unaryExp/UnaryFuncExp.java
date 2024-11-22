@@ -12,6 +12,7 @@ import middle.llvm_ir.instruction.jump.call.IrCallVoidInstr;
 import middle.llvm_ir.instruction.type_change.IrTruncInstr;
 import middle.llvm_ir.instruction.type_change.IrZextInstr;
 import middle.llvm_ir.type.IrIntType;
+import middle.llvm_ir.utils.constant.IrConstInt;
 import middle.symbol.FuncSymbol;
 import middle.symbol.VarSymbol;
 import middle.symbol.value.ValueType;
@@ -80,9 +81,17 @@ public class UnaryFuncExp implements UnaryExpEle {
 
                 // type change
                 if (paramSymbol.getValueType() == ValueType.CHAR && expIR.getType().isINT32()) {
-                    expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    if (expIR instanceof IrConstInt constInt) {
+                        return new IrConstInt(IrIntType.INT8, constInt.getValue());
+                    } else {
+                        expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    }
                 } else if (paramSymbol.getValueType() == ValueType.INT && expIR.getType().isINT8()) {
-                    expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    if (expIR instanceof IrConstInt constInt) {
+                        return new IrConstInt(IrIntType.INT32, constInt.getValue());
+                    } else {
+                        expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
+                    }
                 }
 
                 params.add(expIR);

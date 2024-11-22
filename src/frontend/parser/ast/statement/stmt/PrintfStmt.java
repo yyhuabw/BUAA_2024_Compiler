@@ -8,7 +8,6 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.jump.io.IrPutchInstr;
 import middle.llvm_ir.instruction.jump.io.IrPutintInstr;
 import middle.llvm_ir.instruction.jump.io.IrPutstrInstr;
-import middle.llvm_ir.instruction.type_change.IrZextInstr;
 import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.utils.IrStrLiteral;
 
@@ -99,16 +98,10 @@ public class PrintfStmt implements StmtEle {
                     sb.setLength(0);
                 }
                 if (str.charAt(i+1) == 'd') { // %d
-                    IrValue expIR = exps.get(expIndex++).genIR();
-                    if (!expIR.getType().isINT32()) {
-                        expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
-                    }
+                    IrValue expIR = exps.get(expIndex++).genVarIR(IrIntType.INT32);
                     new IrPutintInstr(expIR);
                 } else { // %c
-                    IrValue expIR = exps.get(expIndex++).genIR();
-                    if (!expIR.getType().isINT32()) {
-                        expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
-                    }
+                    IrValue expIR = exps.get(expIndex++).genVarIR(IrIntType.INT32);
                     new IrPutchInstr(expIR);
                 }
                 i++; // skip %d | %c

@@ -1,6 +1,8 @@
 package middle.llvm_ir.function;
 
+import backend.mips.MipsBuilder;
 import backend.mips.Register;
+import backend.mips.assembly.instruction.MipsLabel;
 import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrUser;
@@ -98,5 +100,29 @@ public class IrFunction extends IrUser {
                         collect(Collectors.joining("\n")) +
 
                 "}\n\n";
+    }
+
+    @Override
+    public void genAsm() {
+        new MipsLabel(getName().substring(1));
+
+        // enter a new function
+        MipsBuilder.getInstance().enterFunc(this);
+
+        // func_formal_param -> offset
+        for (int i = 0; i < params.size(); i++) {
+            IrFParam param = params.get(i);
+            if (i < 3) { // a1-a3
+                MipsBuilder.getInstance().allocaRegToParam(param,
+                        Register.getRegWithIndex(Register.A0, i + 1));
+            }
+            MipsBuilder.getInstance().downwardCurOffset(4);
+            // the first 3 mapping to empty-value-offset
+            MipsBuilder.getInstance().addValueMapping(param, MipsBuilder.getInstance().getCurStackOffset());
+        }
+
+        for (IrBasicBlock block : blocks) {
+            block.genAsm();
+        }
     }
 }

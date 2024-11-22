@@ -3,12 +3,8 @@ package frontend.parser.ast.statement.stmt;
 import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.primaryExp.LVal;
 import frontend.parser.ast.expression.single.Exp;
-import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.memory.IrStoreInstr;
-import middle.llvm_ir.instruction.type_change.IrTruncInstr;
-import middle.llvm_ir.instruction.type_change.IrZextInstr;
-import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrPointerType;
 
 public class AssignStmt implements StmtEle {
@@ -33,12 +29,7 @@ public class AssignStmt implements StmtEle {
     @Override
     public IrValue genIR() {
         IrValue lValIR = lVal.genIRForAssign();
-        IrValue expIR = exp.genIR(); // should be i32
-        if (expIR.getType().isINT32() && ((IrPointerType) lValIR.getType()).getTargetType().isINT8()) { // LVal i8 = exp i32
-            expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
-        } else if (expIR.getType().isINT8() && ((IrPointerType) lValIR.getType()).getTargetType().isINT32()) { // LVal i32 = exp i8
-            expIR = new IrZextInstr(IrIntType.INT32, IrBuilder.getInstance().getLocalVarName(), expIR);
-        }
+        IrValue expIR = exp.genVarIR(((IrPointerType) lValIR.getType()).getTargetType());
         new IrStoreInstr(expIR, lValIR);
         return null;
     }

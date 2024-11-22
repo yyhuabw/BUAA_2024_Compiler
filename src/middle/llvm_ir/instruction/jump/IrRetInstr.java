@@ -2,6 +2,8 @@ package middle.llvm_ir.instruction.jump;
 
 import backend.mips.MipsBuilder;
 import backend.mips.Register;
+import backend.mips.assembly.instruction.MipsComment;
+import backend.mips.assembly.instruction.MipsSyscallInstr;
 import backend.mips.assembly.instruction.extended.MipsLiInstr;
 import backend.mips.assembly.instruction.extended.MipsMoveInstr;
 import backend.mips.assembly.instruction.jump.MipsJumpInstr;
@@ -48,6 +50,14 @@ public class IrRetInstr extends IrInstruction {
 
     @Override
     public void genAsm() {
+        if (MipsBuilder.getInstance().getCurFunc().getName().equals("@main")) {
+            // exit
+            new MipsComment("exit");
+            new MipsLiInstr(Register.V0, 10);
+            new MipsSyscallInstr();
+            return;
+        }
+
         super.genAsm();
 
         IrValue retValue = getRetValue();
