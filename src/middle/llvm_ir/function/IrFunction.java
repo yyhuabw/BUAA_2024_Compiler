@@ -7,8 +7,12 @@ import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrUser;
 import middle.llvm_ir.IrValue;
+import middle.llvm_ir.instruction.IrInstruction;
+import middle.llvm_ir.instruction.jump.call.IrCallInstr;
+import middle.llvm_ir.instruction.jump.io.IrIOInstr;
 import middle.llvm_ir.type.IrFuncType;
 import middle.llvm_ir.type.IrType;
+import middle.llvm_ir.utils.IrGlobalVar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +30,9 @@ public class IrFunction extends IrUser {
     // dominate graph|tree
     private HashMap<IrBasicBlock, IrBasicBlock> idomorMap = null; // dominated -> immediate dominator
     private HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap = null; // block -> immediate dominateds
+
+    // GVN
+    private Boolean canGVN = null;
 
     // register-Allocate
     private HashMap<IrValue, Register> var2reg = null;
@@ -83,6 +90,47 @@ public class IrFunction extends IrUser {
 
     public HashMap<IrValue, Register> getVar2reg() {
         return var2reg;
+    }
+
+    /**
+     * check can be GVN optimized or not
+     * 1. params don't contain pointer
+     * 2. all instructions can't read or write GlobalVar
+     * 3. without calling other functions
+     */
+    public boolean canGVN() {
+        if (canGVN != null) {
+            return canGVN;
+        }
+
+        // 1. params don't contain pointer
+        for (IrFParam param : params) {
+            if (param.getType().isPointer()) {
+                canGVN = false;
+                return false;
+            }
+        }
+
+        for (IrBasicBlock block : blocks) {
+            for (IrInstruction instruction : block.getInstrList()) {
+                // 3. without calling other functions
+                if (instruction instanceof IrCallInstr || instruction instanceof IrIOInstr) {
+                    canGVN = false;
+                    return false;
+                }
+
+                // 2. all instructions can't read or write GlobalVar
+                for (IrValue operand : instruction.getOperands()) {
+                    if (operand instanceof IrGlobalVar) {
+                        canGVN = false;
+                        return false;
+                    }
+                }
+            }
+        }
+
+        canGVN = true;
+        return true;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package middle.optimize;
+package processor.optimizer;
 
 import backend.mips.Register;
 import middle.llvm_ir.IrBasicBlock;

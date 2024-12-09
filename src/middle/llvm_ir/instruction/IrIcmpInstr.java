@@ -37,6 +37,10 @@ public class IrIcmpInstr extends IrInstruction {
         return getOperand(1);
     }
 
+    public String getGVNHash() {
+        return "icmp " + getOperand1().getName() + " " + op + " " + getOperand2().getName();
+    }
+
     @Override
     public boolean canBeUsed() {
         return true;

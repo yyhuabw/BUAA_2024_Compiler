@@ -1,4 +1,4 @@
-package middle.optimize;
+package processor.optimizer;
 
 import middle.llvm_ir.*;
 import middle.llvm_ir.function.IrFunction;

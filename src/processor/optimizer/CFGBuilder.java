@@ -1,4 +1,4 @@
-package middle.optimize;
+package processor.optimizer;
 
 import middle.llvm_ir.IrBasicBlock;
 import middle.llvm_ir.IrModule;

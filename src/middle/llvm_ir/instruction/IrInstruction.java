@@ -33,6 +33,10 @@ public class IrInstruction extends IrUser {
         return parentBlock;
     }
 
+    public String getGVNHash() {
+        return null;
+    }
+
     @Override
     public void genAsm() {
         new MipsComment(this.irOutput().substring(0, this.irOutput().length() - 1));

@@ -24,6 +24,10 @@ public class IrType {
         return this instanceof IrArrayType;
     }
 
+    public boolean isPointer() {
+        return this instanceof IrPointerType;
+    }
+
     public String irOutput() {
         return "";
     }

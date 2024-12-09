@@ -1,4 +1,4 @@
-package middle.optimize;
+package processor.optimizer;
 
 import middle.llvm_ir.IrModule;
 
@@ -13,8 +13,11 @@ public class Optimizer {
         new SimplifyBlock(module).run();
         new CFGBuilder(module).run();
 
-//        new Mem2Reg(module).run();
-//        new CheckTypeChangeInstr(module).run();
+        new Mem2Reg(module).run();
+        new CheckTypeChangeInstr(module).run();
+
+        new GVN(module).run();
+        new CheckTypeChangeInstr(module).run();
 
         new ActiveVarAnalyzer(module).run();
         new RegAllocator(module).run();

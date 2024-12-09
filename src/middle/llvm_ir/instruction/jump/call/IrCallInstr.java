@@ -49,6 +49,20 @@ public class IrCallInstr extends IrInstruction {
         return paramsInfo;
     }
 
+    public boolean canGVN() {
+        return getFunction().canGVN();
+    }
+
+    public String getGVNHash() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("call ").append(getFunction().getName()).append("(");
+        for (IrValue value : getParams()) {
+            sb.append(value.getName()).append(", ");
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     /**
      * the stack allocation strategy is as follows:
      * +-------------------------+ <- sp

@@ -6,7 +6,7 @@ import frontend.parser.ast.CompUnit;
 import middle.error.ErrorTable;
 import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrModule;
-import middle.optimize.Optimizer;
+import processor.optimizer.Optimizer;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -33,12 +33,12 @@ public class Compiler {
         compUnit.genIR();
         IrModule irModule = IrBuilder.getInstance().getModule();
 
+        IrBuilder.getInstance().setDefaultMode();
+        Optimizer.getInstance().run(irModule);
+
         try (OutputStream outputStream = new FileOutputStream(tempOutputFileName)) {
             outputStream.write(irModule.irOutput().getBytes());
         }
-
-        IrBuilder.getInstance().setDefaultMode();
-        Optimizer.getInstance().run(irModule);
 
         irModule.genAsm();
         MipsModule mipsModule = MipsBuilder.getInstance().getModule();

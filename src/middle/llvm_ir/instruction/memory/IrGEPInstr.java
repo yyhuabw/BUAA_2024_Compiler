@@ -33,6 +33,10 @@ public class IrGEPInstr extends IrInstruction {
         return getOperand(1);
     }
 
+    public String getGVNHash() {
+        return "gep " + getPtrValue().getName() + " " + getIndex().getName();
+    }
+
     @Override
     public boolean canBeUsed() {
         return true;
