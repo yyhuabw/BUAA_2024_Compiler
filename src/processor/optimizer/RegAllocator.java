@@ -6,6 +6,7 @@ import middle.llvm_ir.IrModule;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.function.IrFunction;
 import middle.llvm_ir.instruction.IrInstruction;
+import middle.llvm_ir.instruction.IrPhiInstr;
 import middle.llvm_ir.instruction.type_change.IrZextInstr;
 
 import java.util.ArrayList;
@@ -68,13 +69,15 @@ public class RegAllocator {
         for (IrInstruction instruction : entrance.getInstrList()) {
             // for those last-use and won't out
             // release the register and save it to wontUsed for recover
-            // TODO: special judgment of phiInstr: because phi is parallel, we can't release
-            for (IrValue operand : instruction.getOperands()) {
-                if (lastUse.get(operand) == instruction &&
-                        !entrance.getOut().contains(operand) &&
-                        var2reg.containsKey(operand)) {
-                    reg2var.remove(var2reg.get(operand));
-                    wontUsed.add(operand);
+            // special judgment of phiInstr?
+            if (!(instruction instanceof IrPhiInstr)) {
+                for (IrValue operand : instruction.getOperands()) {
+                    if (lastUse.get(operand) == instruction &&
+                            !entrance.getOut().contains(operand) &&
+                            var2reg.containsKey(operand)) {
+                        reg2var.remove(var2reg.get(operand));
+                        wontUsed.add(operand);
+                    }
                 }
             }
 

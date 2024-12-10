@@ -13,5 +13,7 @@ public enum IrInstrType {
     GEP, // get element ptr
     ZEXT,
     TRUNC,
-    PHI
+    PHI,
+    PC, // parallel copy
+    MOVE
 }

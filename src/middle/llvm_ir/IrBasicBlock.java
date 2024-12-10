@@ -104,6 +104,10 @@ public class IrBasicBlock extends IrUser {
         this.DF = DF;
     }
 
+    public ArrayList<IrBasicBlock> getPrevBlocks() {
+        return prevBlocks;
+    }
+
     public ArrayList<IrBasicBlock> getNextBlocks() {
         return nextBlocks;
     }

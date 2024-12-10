@@ -17,9 +17,13 @@ public class Optimizer {
         new CheckTypeChangeInstr(module).run();
 
         new GVN(module).run();
+
+        new DeadCodeRemove(module).run();
         new CheckTypeChangeInstr(module).run();
 
         new ActiveVarAnalyzer(module).run();
         new RegAllocator(module).run();
+
+        new RemovePhi(module).run();
     }
 }

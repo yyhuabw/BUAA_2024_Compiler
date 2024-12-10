@@ -76,6 +76,16 @@ public class MipsBuilder {
         return stackMap.get(value);
     }
 
+    public Integer getOrSetOffsetOf(IrValue value) {
+        Integer offset = getOffsetOf(value);
+        if (offset == null) {
+            downwardCurOffset(4);
+            offset = getCurStackOffset();
+            addValueMapping(value, offset);
+        }
+        return offset;
+    }
+
     // for we have reg-allocator
     public boolean useReg() {
         return var2reg != null;

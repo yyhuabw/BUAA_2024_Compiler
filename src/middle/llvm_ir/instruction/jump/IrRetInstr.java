@@ -67,7 +67,7 @@ public class IrRetInstr extends IrInstruction {
             } else if (MipsBuilder.getInstance().getRegFor(retValue) != null) { // have reg
                 new MipsMoveInstr(Register.V0, MipsBuilder.getInstance().getRegFor(retValue));
             } else { // load-from-stack
-                new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.V0, Register.SP, MipsBuilder.getInstance().getOffsetOf(retValue));
+                new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.V0, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(retValue));
             }
         }
 

@@ -37,6 +37,10 @@ public class IrUser extends IrValue {
         return operands.get(index);
     }
 
+    public void setOperand(int index, IrValue operand) {
+        operands.set(index, operand);
+    }
+
     public ArrayList<IrValue> getOperands() {
         return new ArrayList<>(operands);
     }

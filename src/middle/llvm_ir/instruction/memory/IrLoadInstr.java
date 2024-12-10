@@ -68,7 +68,7 @@ public class IrLoadInstr extends IrInstruction {
         }
 
         // load-from-stack
-        new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.K0, Register.SP, MipsBuilder.getInstance().getOffsetOf(pointer));
+        new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.K0, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(pointer));
         return Register.K0;
     }
 }

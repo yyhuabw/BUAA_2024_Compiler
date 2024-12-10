@@ -87,7 +87,7 @@ public class IrGEPInstr extends IrInstruction {
             if (MipsBuilder.getInstance().getRegFor(index) != null) {
                 indexReg = MipsBuilder.getInstance().getRegFor(index);
             } else {
-                new MipsLoadInstr(MipsLoadInstr.Op.lw, indexReg, Register.SP, MipsBuilder.getInstance().getOffsetOf(index));
+                new MipsLoadInstr(MipsLoadInstr.Op.lw, indexReg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(index));
             }
             // base + index << 2
             new MipsRIAluInstr(MipsRIAluInstr.Op.sll, Register.K1, indexReg, 2);
@@ -117,7 +117,7 @@ public class IrGEPInstr extends IrInstruction {
         }
 
         // load-from-stack
-        new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.K0, Register.SP, MipsBuilder.getInstance().getOffsetOf(ptrValue));
+        new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.K0, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(ptrValue));
         return Register.K0;
     }
 }

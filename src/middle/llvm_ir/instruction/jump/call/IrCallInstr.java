@@ -122,7 +122,7 @@ public class IrCallInstr extends IrInstruction {
                             tmpReg = paramReg;
                         }
                     } else {
-                        new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, MipsBuilder.getInstance().getOffsetOf(param));
+                        new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(param));
                     }
                 }
 
@@ -174,7 +174,7 @@ public class IrCallInstr extends IrInstruction {
         }
 
         // load-from-stack
-        new MipsLoadInstr(MipsLoadInstr.Op.lw, reg, Register.SP, MipsBuilder.getInstance().getOffsetOf(param));
+        new MipsLoadInstr(MipsLoadInstr.Op.lw, reg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(param));
         return reg;
     }
 }

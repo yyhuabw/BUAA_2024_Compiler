@@ -43,7 +43,7 @@ public class IrZextInstr extends IrInstruction {
             MipsBuilder.getInstance().addValueMapping(this, curOffset);
             new MipsStoreInstr(MipsStoreInstr.Op.sw, oriReg, Register.SP, curOffset);
         } else { // oriValue in stack
-            MipsBuilder.getInstance().addValueMapping(this, MipsBuilder.getInstance().getOffsetOf(getOriginValue()));
+            MipsBuilder.getInstance().addValueMapping(this, MipsBuilder.getInstance().getOrSetOffsetOf(getOriginValue()));
         }
     }
 }

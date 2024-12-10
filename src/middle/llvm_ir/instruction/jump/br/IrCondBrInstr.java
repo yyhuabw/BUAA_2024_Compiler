@@ -32,6 +32,14 @@ public class IrCondBrInstr extends IrBrInstr {
         return (IrBasicBlock) getOperand(2);
     }
 
+    public void setIfTrueBlock(IrBasicBlock ifTrueBlock) {
+        setOperand(1, ifTrueBlock);
+    }
+
+    public void setIfFalseBlock(IrBasicBlock ifFalseBlock) {
+        setOperand(2, ifFalseBlock);
+    }
+
     @Override
     public String irOutput() {
         return "br i1 " +
@@ -50,7 +58,7 @@ public class IrCondBrInstr extends IrBrInstr {
         Register reg = MipsBuilder.getInstance().getRegFor(cond);
         if (reg == null) {
             reg = Register.K0;
-            new MipsLoadInstr(MipsLoadInstr.Op.lw, reg, Register.SP, MipsBuilder.getInstance().getOffsetOf(cond));
+            new MipsLoadInstr(MipsLoadInstr.Op.lw, reg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(cond));
         }
 
         // cond == 1 <-> true

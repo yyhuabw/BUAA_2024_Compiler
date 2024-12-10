@@ -16,7 +16,7 @@ import java.io.PushbackInputStream;
 public class Compiler {
     public static void main(String[] args) throws Exception {
         String inputFileName = "testfile.txt";
-        String tempOutputFileName = "llvm_ir.txt";
+        String irOutputFileName = "llvm_ir.txt";
         String outputFileName = "mips.txt";
         String errorFileName = "error.txt";
 
@@ -36,7 +36,7 @@ public class Compiler {
         IrBuilder.getInstance().setDefaultMode();
         Optimizer.getInstance().run(irModule);
 
-        try (OutputStream outputStream = new FileOutputStream(tempOutputFileName)) {
+        try (OutputStream outputStream = new FileOutputStream(irOutputFileName)) {
             outputStream.write(irModule.irOutput().getBytes());
         }
 

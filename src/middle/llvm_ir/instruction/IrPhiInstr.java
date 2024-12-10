@@ -20,6 +20,10 @@ public class IrPhiInstr extends IrInstruction {
         addOperand(value);
     }
 
+    public ArrayList<IrBasicBlock> getOptionalBlocks() {
+        return optionalBlocks;
+    }
+
     @Override
     public boolean canBeUsed() {
         return true;

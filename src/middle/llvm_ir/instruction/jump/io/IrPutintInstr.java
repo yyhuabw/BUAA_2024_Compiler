@@ -41,7 +41,7 @@ public class IrPutintInstr extends IrIOInstr {
         } else if (MipsBuilder.getInstance().getRegFor(value) != null) {
             new MipsMoveInstr(Register.A0, MipsBuilder.getInstance().getRegFor(value));
         } else { // load-from-stack
-            new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.A0, Register.SP, MipsBuilder.getInstance().getOffsetOf(value));
+            new MipsLoadInstr(MipsLoadInstr.Op.lw, Register.A0, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(value));
         }
 
         new MipsLiInstr(Register.V0, 1);

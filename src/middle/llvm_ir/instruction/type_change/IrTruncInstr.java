@@ -51,7 +51,7 @@ public class IrTruncInstr extends IrInstruction {
             // truncation
             new MipsRIAluInstr(MipsRIAluInstr.Op.andi, finalReg, oriReg, 0xFF);
         } else { // oriValue in stack
-            new MipsLoadInstr(MipsLoadInstr.Op.lb, finalReg, Register.SP, MipsBuilder.getInstance().getOffsetOf(getOriginValue()));
+            new MipsLoadInstr(MipsLoadInstr.Op.lb, finalReg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(getOriginValue()));
         }
 
         if (finalReg == Register.K0) {
