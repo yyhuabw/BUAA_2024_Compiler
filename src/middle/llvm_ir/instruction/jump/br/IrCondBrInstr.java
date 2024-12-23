@@ -32,14 +32,6 @@ public class IrCondBrInstr extends IrBrInstr {
         return (IrBasicBlock) getOperand(2);
     }
 
-    public void setIfTrueBlock(IrBasicBlock ifTrueBlock) {
-        setOperand(1, ifTrueBlock);
-    }
-
-    public void setIfFalseBlock(IrBasicBlock ifFalseBlock) {
-        setOperand(2, ifFalseBlock);
-    }
-
     @Override
     public String irOutput() {
         return "br i1 " +

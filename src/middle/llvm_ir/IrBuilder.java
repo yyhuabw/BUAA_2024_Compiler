@@ -66,10 +66,6 @@ public class IrBuilder {
         this.mode = AUTO_INSERT_MODE;
     }
 
-    public void setDefaultMode() {
-        this.mode = DEFAULT_MODE;
-    }
-
     public boolean isAutoInsertMode() {
         return mode == AUTO_INSERT_MODE;
     }
@@ -170,12 +166,6 @@ public class IrBuilder {
     public String getLocalVarName() {
         int curIndex = varCntMap.get(curFunction);
         varCntMap.put(curFunction, curIndex + 1);
-        return LOCAL_VAR_PREFIX + curIndex;
-    }
-
-    public String getLocalVarName(IrFunction function) { // for phiInstr
-        int curIndex = varCntMap.get(function);
-        varCntMap.put(function, curIndex + 1);
         return LOCAL_VAR_PREFIX + curIndex;
     }
 

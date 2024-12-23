@@ -64,73 +64,8 @@ public class IrFunction extends IrUser {
         return returnType.isVoid();
     }
 
-    public LinkedList<IrBasicBlock> getBlocks() {
-        return blocks;
-    }
-
-    public void setPrevMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> prevMap) {
-        this.prevMap = prevMap;
-    }
-
-    public void setNextMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> nextMap) {
-        this.nextMap = nextMap;
-    }
-
-    public void setIdomorMap(HashMap<IrBasicBlock, IrBasicBlock> idomorMap) {
-        this.idomorMap = idomorMap;
-    }
-
-    public void setIdomedMap(HashMap<IrBasicBlock, ArrayList<IrBasicBlock>> idomedMap) {
-        this.idomedMap = idomedMap;
-    }
-
-    public void setVar2reg(HashMap<IrValue, Register> var2reg) {
-        this.var2reg = var2reg;
-    }
-
     public HashMap<IrValue, Register> getVar2reg() {
         return var2reg;
-    }
-
-    /**
-     * check can be GVN optimized or not
-     * 1. params don't contain pointer
-     * 2. all instructions can't read or write GlobalVar
-     * 3. without calling other functions
-     */
-    public boolean canGVN() {
-        if (canGVN != null) {
-            return canGVN;
-        }
-
-        // 1. params don't contain pointer
-        for (IrFParam param : params) {
-            if (param.getType().isPointer()) {
-                canGVN = false;
-                return false;
-            }
-        }
-
-        for (IrBasicBlock block : blocks) {
-            for (IrInstruction instruction : block.getInstrList()) {
-                // 3. without calling other functions
-                if (instruction instanceof IrCallInstr || instruction instanceof IrIOInstr) {
-                    canGVN = false;
-                    return false;
-                }
-
-                // 2. all instructions can't read or write GlobalVar
-                for (IrValue operand : instruction.getOperands()) {
-                    if (operand instanceof IrGlobalVar) {
-                        canGVN = false;
-                        return false;
-                    }
-                }
-            }
-        }
-
-        canGVN = true;
-        return true;
     }
 
     @Override
@@ -158,12 +93,7 @@ public class IrFunction extends IrUser {
         MipsBuilder.getInstance().enterFunc(this);
 
         // func_formal_param -> offset
-        for (int i = 0; i < params.size(); i++) {
-            IrFParam param = params.get(i);
-            if (i < 3) { // a1-a3
-                MipsBuilder.getInstance().allocaRegToParam(param,
-                        Register.getRegWithIndex(Register.A0, i + 1));
-            }
+        for (IrFParam param : params) {
             MipsBuilder.getInstance().downwardCurOffset(4);
             // the first 3 mapping to empty-value-offset
             MipsBuilder.getInstance().addValueMapping(param, MipsBuilder.getInstance().getCurStackOffset());

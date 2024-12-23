@@ -86,11 +86,6 @@ public class MipsBuilder {
         return offset;
     }
 
-    // for we have reg-allocator
-    public boolean useReg() {
-        return var2reg != null;
-    }
-
     public void allocaRegToParam(IrFParam param, Register register) {
         if (var2reg == null) {
             return;

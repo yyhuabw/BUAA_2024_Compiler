@@ -32,10 +32,6 @@ public class IrAluInstr extends IrInstruction {
         addOperand(operand2);
     }
 
-    public Op getOp() {
-        return op;
-    }
-
     public IrValue getOperand1() {
         return getOperand(0);
     }

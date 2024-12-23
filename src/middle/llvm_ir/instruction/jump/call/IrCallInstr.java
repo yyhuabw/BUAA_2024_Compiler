@@ -49,10 +49,6 @@ public class IrCallInstr extends IrInstruction {
         return paramsInfo;
     }
 
-    public boolean canGVN() {
-        return getFunction().canGVN();
-    }
-
     public String getGVNHash() {
         StringBuilder sb = new StringBuilder();
         sb.append("call ").append(getFunction().getName()).append("(");
@@ -101,34 +97,26 @@ public class IrCallInstr extends IrInstruction {
         for (IrValue param : params) {
             paramNum++;
 
-            // a1-a3 (a0 is for IO only)
-            if (paramNum <= 3 && MipsBuilder.getInstance().useReg()) {
-                Register paramReg = paramIntoAReg(param, Register.getRegWithIndex(Register.A0, paramNum), curOffset, allocatedRegs);
+            // need store-to-stack
+            Register tmpReg = Register.K0;
 
-                if (!MipsBuilder.getInstance().useReg()) {
-                    new MipsStoreInstr(MipsStoreInstr.Op.sw, paramReg, Register.SP, curOffset - regNum * 4 - 4 - paramNum * 4);
-                }
-            } else { // need store-to-stack
-                Register tmpReg = Register.K0;
-
-                if (param instanceof IrConstInt constInt) {
-                    new MipsLiInstr(tmpReg, constInt.getValue());
-                } else {
-                    Register paramReg = MipsBuilder.getInstance().getRegFor(param);
-                    if (paramReg != null) {
-                        if (param instanceof IrFParam) {
-                            new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, curOffset - (allocatedRegs.indexOf(paramReg) + 1) * 4);
-                        } else {
-                            tmpReg = paramReg;
-                        }
+            if (param instanceof IrConstInt constInt) {
+                new MipsLiInstr(tmpReg, constInt.getValue());
+            } else {
+                Register paramReg = MipsBuilder.getInstance().getRegFor(param);
+                if (paramReg != null) {
+                    if (param instanceof IrFParam) {
+                        new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, curOffset - (allocatedRegs.indexOf(paramReg) + 1) * 4);
                     } else {
-                        new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(param));
+                        tmpReg = paramReg;
                     }
+                } else {
+                    new MipsLoadInstr(MipsLoadInstr.Op.lw, tmpReg, Register.SP, MipsBuilder.getInstance().getOrSetOffsetOf(param));
                 }
-
-                // reserve space for a1-a3
-                new MipsStoreInstr(MipsStoreInstr.Op.sw, tmpReg, Register.SP, curOffset - regNum * 4 - 4 - paramNum * 4);
             }
+
+            // reserve space for a1-a3
+            new MipsStoreInstr(MipsStoreInstr.Op.sw, tmpReg, Register.SP, curOffset - regNum * 4 - 4 - paramNum * 4);
         }
 
         // sp -> new sp
