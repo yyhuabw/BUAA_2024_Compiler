@@ -10,7 +10,7 @@ import middle.llvm_ir.instruction.type_change.IrTruncInstr;
 import middle.llvm_ir.type.IrIntType;
 import middle.llvm_ir.type.IrPointerType;
 
-// LVal '=' 'getchar''('')'';'
+// GetcharStmt → LVal '=' 'getchar''('')'';'
 public class GetcharStmt implements StmtEle {
     private final LVal lVal;
     private final Token assign;

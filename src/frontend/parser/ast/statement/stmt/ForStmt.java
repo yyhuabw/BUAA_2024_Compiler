@@ -9,6 +9,7 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.memory.IrStoreInstr;
 import middle.llvm_ir.type.IrPointerType;
 
+// ForStmt → LVal '=' Exp
 public class ForStmt implements SyntaxNode {
     private final SyntaxType type;
     private final LVal lVal;

@@ -132,6 +132,8 @@ public class GVN {
             case mul -> operand1 * operand2;
             case sdiv -> operand1 / operand2;
             case srem -> operand1 % operand2;
+            case and -> operand1 & operand2;
+            case or -> operand1 | operand2;
         };
 
         return new IrConstInt(IrIntType.INT32, result);

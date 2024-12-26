@@ -153,14 +153,14 @@ public class Parser {
         StmtEle stmtEle;
 
         switch (curToken.getType()) {
-            case SEMICN -> stmtEle = parseNullStmt();
-            case LBRACE -> stmtEle = parseBlock(true);
-            case IFTK -> stmtEle = parseIfStmt();
-            case FORTK -> stmtEle = parseForLoopStmt();
-            case BREAKTK -> stmtEle = parseBreakStmt();
-            case CONTINUETK -> stmtEle = parseContinueStmt();
-            case RETURNTK -> stmtEle = parseReturnStmt();
-            case PRINTFTK -> stmtEle = parsePrintfStmt();
+            case SEMICN -> stmtEle = parseNullStmt(); // ";"
+            case LBRACE -> stmtEle = parseBlock(true); // "{"
+            case IFTK -> stmtEle = parseIfStmt(); // "if"
+            case FORTK -> stmtEle = parseForLoopStmt(); // "for"
+            case BREAKTK -> stmtEle = parseBreakStmt(); // "break"
+            case CONTINUETK -> stmtEle = parseContinueStmt(); // "continue"
+            case RETURNTK -> stmtEle = parseReturnStmt(); // "return"
+            case PRINTFTK -> stmtEle = parsePrintfStmt(); // "printf"
             case IDENFR -> stmtEle = dealIdentCase();
             case LPARENT, INTCON, CHRCON, PLUS, MINU, NOT -> stmtEle = parseExpStmt();
 
@@ -190,7 +190,7 @@ public class Parser {
                 backtrack();
                 return parseAssignStmt();
             }
-        } else {
+        } else { // ExpStmt
             backtrack();
             return parseExpStmt();
         }
@@ -255,7 +255,7 @@ public class Parser {
         Token leftParent = getCurToken();
         read();
 
-        if (!curEquals(TokenType.SEMICN)) {
+        if (!curEquals(TokenType.SEMICN)) { // ";"
             forStmt1 = parseForStmt();
         }
 
@@ -1089,6 +1089,8 @@ public class Parser {
         if (!(symbol instanceof FuncSymbol funcSymbol)) {
             return; // undefined ident
         }
+
+        // func-symbol
         if (funcRParams != null && funcSymbol.getParamsSize() == funcRParams.getParamsSize()) {
             ArrayList<Exp> exps = funcRParams.getAllExps();
             ArrayList<VarSymbol> paramSymbols = funcSymbol.getParamSymbols();
@@ -1101,7 +1103,7 @@ public class Parser {
                     return;
                 }
 
-                if (expDim != paramSymbol.getDim()) { // array <-> int
+                if (expDim != paramSymbol.getDim()) { // array <-> no-array
                     addError(ErrorType.PARAM_TYPE_MISMATCH, ident.getLineno());
                     return;
                 }

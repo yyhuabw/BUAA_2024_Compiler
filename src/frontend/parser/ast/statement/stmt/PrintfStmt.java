@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// 'printf''('StringConst {','Exp}')'';'
+// PrintfStmt → 'printf''('StringConst {','Exp}')'';'
 public class PrintfStmt implements StmtEle {
     private final Token printfTk;
     private final Token leftParent;

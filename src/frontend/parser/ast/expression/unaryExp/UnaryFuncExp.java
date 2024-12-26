@@ -82,7 +82,8 @@ public class UnaryFuncExp implements UnaryExpEle {
                 // type change
                 if (paramSymbol.getValueType() == ValueType.CHAR && expIR.getType().isINT32()) {
                     if (expIR instanceof IrConstInt constInt) {
-                        return new IrConstInt(IrIntType.INT8, constInt.getValue());
+                        int value = constInt.getValue() & 0xff;
+                        return new IrConstInt(IrIntType.INT8, value);
                     } else {
                         expIR = new IrTruncInstr(IrIntType.INT8, IrBuilder.getInstance().getLocalVarName(), expIR);
                     }

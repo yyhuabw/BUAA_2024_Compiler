@@ -34,7 +34,8 @@ public class CheckTypeChangeInstr {
                 zextInstr.allUserChangeToNewValue(new IrConstInt(IrIntType.INT32, constInt.getValue()));
                 iterator.remove();
             } else if (instruction instanceof IrTruncInstr truncInstr && truncInstr.getOriginValue() instanceof IrConstInt constInt) { // i32 -> i8
-                truncInstr.allUserChangeToNewValue(new IrConstInt(IrIntType.INT8, constInt.getValue()));
+                int value = constInt.getValue() & 0xff;
+                truncInstr.allUserChangeToNewValue(new IrConstInt(IrIntType.INT8, value));
                 iterator.remove();
             }
         }

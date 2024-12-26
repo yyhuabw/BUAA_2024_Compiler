@@ -7,6 +7,7 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.memory.IrStoreInstr;
 import middle.llvm_ir.type.IrPointerType;
 
+// AssignStmt → LVal '=' Exp ';'
 public class AssignStmt implements StmtEle {
     private final LVal lVal;
     private final Token assign;

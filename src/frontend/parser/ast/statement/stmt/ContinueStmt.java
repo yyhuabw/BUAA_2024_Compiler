@@ -5,6 +5,7 @@ import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.jump.br.IrDirtBrInstr;
 
+// ContinueStmt →  'continue' ';'
 public class ContinueStmt implements StmtEle {
     private final Token continueTk;
     private final Token semicolon;

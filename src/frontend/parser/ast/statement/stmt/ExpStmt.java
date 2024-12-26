@@ -4,7 +4,7 @@ import frontend.lexer.token.Token;
 import frontend.parser.ast.expression.single.Exp;
 import middle.llvm_ir.IrValue;
 
-// Exp ';'
+// ExpStmt → Exp ';'
 public class ExpStmt implements StmtEle {
     private final Exp exp;
     private final Token semicolon;

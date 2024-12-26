@@ -17,17 +17,23 @@ public class Compiler {
     public static void main(String[] args) throws Exception {
         String inputFileName = "testfile.txt";
         String irOutputFileName = "llvm_ir.txt";
-        String outputFileName = "mips.txt";
+        String asmOutputFileName = "mips.txt";
         String errorFileName = "error.txt";
 
-        PushbackInputStream inputStream =
-                new PushbackInputStream(new FileInputStream(inputFileName));
+        PushbackInputStream inputStream = new PushbackInputStream(new FileInputStream(inputFileName));
         ErrorTable errorTable = new ErrorTable();
 
         Lexer lexer = new Lexer(inputStream, errorTable);
 
         Parser parser = new Parser(lexer.getTokenStream(), errorTable);
         CompUnit compUnit = parser.parseCompUnit();
+
+        try (OutputStream errStream = new FileOutputStream(errorFileName)) {
+            if (!errorTable.isEmpty()) {
+                errStream.write(errorTable.toString().getBytes());
+                return;
+            }
+        }
 
         IrBuilder.getInstance().setAutoInsertMode();
         compUnit.genIR();
@@ -43,14 +49,8 @@ public class Compiler {
         irModule.genAsm();
         MipsModule mipsModule = MipsBuilder.getInstance().getModule();
 
-        try (OutputStream outputStream = new FileOutputStream(outputFileName)) {
-            try (OutputStream errStream = new FileOutputStream(errorFileName)) {
-                if (errorTable.isEmpty()) {
-                    outputStream.write(mipsModule.mipsOutput().getBytes());
-                } else {
-                    errStream.write(errorTable.toString().getBytes());
-                }
-            }
+        try (OutputStream outputStream = new FileOutputStream(asmOutputFileName)) {
+            outputStream.write(mipsModule.mipsOutput().getBytes());
         }
     }
 }

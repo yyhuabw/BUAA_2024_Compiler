@@ -7,7 +7,7 @@ import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.jump.IrRetInstr;
 import middle.llvm_ir.type.IrType;
 
-// 'return' [Exp] ';'
+// ReturnStmt → 'return' [Exp] ';'
 public class ReturnStmt implements StmtEle {
     private final Token returnTk;
     private Exp exp = null;

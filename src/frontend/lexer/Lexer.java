@@ -136,6 +136,7 @@ public class Lexer {
             return getWordToken();
         }
         return switch (curChar) {
+            // Type 1
             case '+' -> getType1Token(TokenType.PLUS, "+");
             case '-' -> getType1Token(TokenType.MINU, "-");
             case '*' -> getType1Token(TokenType.MULT, "*");
@@ -150,13 +151,15 @@ public class Lexer {
             case '{' -> getType1Token(TokenType.LBRACE, "{");
             case '}' -> getType1Token(TokenType.RBRACE, "}");
 
+            // Type 2
             case '&' -> getType2Token('&', TokenType.AND, "&&");
             case '|' -> getType2Token('|', TokenType.OR, "||");
 
-            case '<' -> getType3Token("<", TokenType.LSS, TokenType.LEQ);
-            case '>' -> getType3Token(">", TokenType.GRE, TokenType.GEQ);
-            case '!' -> getType3Token("!", TokenType.NOT, TokenType.NEQ);
-            case '=' -> getType3Token("=", TokenType.ASSIGN, TokenType.EQL);
+            // Type 3
+            case '<' -> getType3Token("<", TokenType.LSS, TokenType.LEQ); // LSS: <, LEQ: <=
+            case '>' -> getType3Token(">", TokenType.GRE, TokenType.GEQ); // GRE: >, GEQ: >=
+            case '!' -> getType3Token("!", TokenType.NOT, TokenType.NEQ); // NOT: !, NEQ: !=
+            case '=' -> getType3Token("=", TokenType.ASSIGN, TokenType.EQL); // ASSIGN: =, EQL: ==
 
             case '"' -> getStringToken(); // string
             case '\'' -> getCharToken(); // char

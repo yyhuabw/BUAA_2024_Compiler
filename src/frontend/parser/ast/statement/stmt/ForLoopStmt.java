@@ -9,7 +9,7 @@ import middle.llvm_ir.instruction.jump.br.IrDirtBrInstr;
 import middle.llvm_ir.utils.IrForLoop;
 import middle.symbol.SymbolManager;
 
-// // 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
+// ForLoopStmt → 'for' '(' [ForStmt] ';' [Cond] ';' [ForStmt] ')' Stmt
 public class ForLoopStmt implements StmtEle {
     private final Token forTk;
     private final Token leftParent;

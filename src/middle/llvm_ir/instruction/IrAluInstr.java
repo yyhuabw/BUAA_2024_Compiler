@@ -18,9 +18,9 @@ public class IrAluInstr extends IrInstruction {
         sub,
         mul,
         sdiv,
-        srem
-        // and
-        // or
+        srem,
+        and,
+        or
     }
 
     private final Op op;
@@ -103,6 +103,12 @@ public class IrAluInstr extends IrInstruction {
             case srem:
                 new MipsMulDivInstr(MipsMulDivInstr.Op.div, reg1, reg2);
                 new MipsMFHiLoInstr(MipsMFHiLoInstr.Op.mfhi, result);
+                break;
+            case and:
+                new MipsRRAluInstr(MipsRRAluInstr.Op.and, result, reg1, reg2);
+                break;
+            case or:
+                new MipsRRAluInstr(MipsRRAluInstr.Op.or, result, reg1, reg2);
                 break;
         }
 

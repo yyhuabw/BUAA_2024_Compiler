@@ -7,7 +7,7 @@ import middle.llvm_ir.IrBuilder;
 import middle.llvm_ir.IrValue;
 import middle.llvm_ir.instruction.jump.br.IrDirtBrInstr;
 
-// 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
+// IfStmt → 'if' '(' Cond ')' Stmt [ 'else' Stmt ]
 public class IfStmt implements StmtEle {
     private final Token ifTk;
     private final Token leftParent;

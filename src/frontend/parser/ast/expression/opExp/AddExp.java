@@ -20,6 +20,7 @@ public class AddExp extends OpExp<MulExp> {
     }
 
     public ValueType getValueType() {
+        // check has undefined ident or not
         if (first.getDim() < 0) { // has undefined ident
             return null;
         }
@@ -41,6 +42,7 @@ public class AddExp extends OpExp<MulExp> {
     }
 
     public int getDim() {
+        // check has undefined ident or not
         if (first.getDim() < 0) { // has undefined ident
             return -1;
         }
